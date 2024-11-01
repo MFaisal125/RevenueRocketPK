@@ -1,0 +1,23 @@
+#blogs-page{
+    padding: 60px 0;
+}
+#blogs-page .blogs-container .category-list ul{
+    margin-left: 10px!important;
+    padding-left: 10px!important;
+}
+#blogs-page .blogs-container .category-list ul li{
+    list-style-type:circle;
+    color: green;
+    border-bottom: 2px solid #bbb;
+    line-height: 40px;
+}
+.blogs-container .category-list ul li a{
+    text-transform: capitalize;
+    color: #111;
+}
+.author .blog_author_name{
+    font-size: 18px;
+    text-transform: capitalize;
+    vertical-align: middle;
+    margin-top: 3px;
+}

@@ -1,0 +1,22 @@
+.about-section{
+    padding: 40px 0;
+}
+.about-section p{
+    text-transform: capitalize;
+    font-size: 14px;
+    line-height: 25px;
+}
+.about-section .about_btn{
+    margin:0 5px;
+    background-color: blue;
+    border: 2px solid blue;
+    color: #000!important;
+}
+.about-section .about_btn:hover{
+    background-color: blue;
+    border-color: #eee;
+    color: #fff;
+}
+.about-section .about_btn a{
+    text-decoration: none;
+}

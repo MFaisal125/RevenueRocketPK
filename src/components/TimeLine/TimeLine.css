@@ -1,0 +1,9 @@
+#timeline{
+    padding: 40px 0;
+}
+#timeline .slide-container .default-nav:last-of-type,.default-nav:first-of-type{
+    display: none;
+}
+.react-slideshow-container .default-nav:first-of-type{
+    display: none;
+}

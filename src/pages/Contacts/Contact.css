@@ -1,0 +1,11 @@
+#contact-page {
+    padding: 60px;
+}
+
+input.valid {
+    border-color: green!important;
+}
+
+input.invalid {
+    border-color: red!important;
+}

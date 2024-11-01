@@ -1,0 +1,174 @@
+footer {
+    padding: 50px 0;
+    background: linear-gradient(10deg, rgb(0 23 245 / 45%), #333), url('../../assets/image/footer-bg.png');
+    width: 100%;
+
+}
+
+.s {
+    color: #08bd08;
+}
+
+footer .footer_box {
+    padding: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+footer .footer_box .footer-item {
+    padding: 0 30px;
+}
+
+.footer_whatsapp {
+    padding: 10px;
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    right: 0;
+    cursor: pointer;
+}
+
+.footer_whatsapp .whatsapp_img {
+    border-radius: 100%;
+    background: #29df29;
+    transition: background-color 0.3s ease-in-out;
+    padding: 5px;
+    filter: hue-rotate(30deg);
+}
+
+.footer_whatsapp h6 {
+    font-size: 20px;
+    color: #08bd08;
+    font-weight: bolder;
+    margin: 0;
+    padding: 0;
+}
+
+.footer_whatsapp .footer_text {
+    margin-bottom: 10px;
+}
+
+footer .footer_wrapper .footer-item .footer_last_social_item:hover {
+    background-color: blue;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.footer_wrapper .payment_methods span {
+    padding: 10px;
+    margin: 5px;
+    background-color: #eee;
+    border-radius: 5px;
+    filter: brightness(.8) grayscale(100);
+    cursor: pointer;
+}
+
+.footer_wrapper .payment_methods span:hover {
+    filter: brightness(1) grayscale(0);
+}
+
+footer .title {
+    padding-top: 30px;
+}
+
+footer .title h3 {
+    color: #fff;
+    text-transform: capitalize;
+}
+
+footer ul,
+ol {
+    padding: 0px 25px;
+}
+
+footer ul li {
+    padding: 5px;
+    list-style: circle;
+    color: #fff;
+    margin: 0;
+    font-size: 14px;
+}
+
+footer ul li a {
+    margin: 0;
+    color: #fff;
+    transition: .3s ease-in-out;
+}
+
+footer ul li a:hover {
+    margin-left: 5px;
+    color: #fff;
+}
+
+/* foter footer-ilen */
+.footer-ilen {
+    padding: 0px 0;
+    width: 100%;
+    background-color: #000;
+}
+
+.footer-ilen div {
+    padding: 1px 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.footer-ilen p {
+    color: #fff;
+    text-align: left;
+    vertical-align: middle;
+    margin-top: 20px;
+    text-transform: capitalize;
+    font-weight: 100;
+}
+
+.footer-ilen ul {
+    margin-top: 15px;
+    vertical-align: middle;
+}
+
+.footer-ilen ul>li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.footer-ilen ul>li a {
+    padding: 0 10px;
+    text-transform: capitalize;
+}
+
+/* all modal style here */
+#accordianId .accordion-header {
+    transition: .5s;
+    margin: 10px 0;
+    background: #fff;
+    border-radius: 30px;
+    box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee;
+}
+
+#accordianId .accordion-header:hover {
+    background-color: black;
+    color: #fff;
+}
+
+#accordianId .accordion-header:hover button {
+    color: #fff;
+}
+
+#accordianId .accordion_body {
+    background-color: #eee;
+    padding: 5px;
+    text-transform: capitalize;
+    font-size: 14px;
+    word-wrap: break-word;
+    color: #111;
+    border-radius: 3px;
+}
+#accordianId .accordion-header button {
+    border: none;
+    background-color: transparent;
+    font-size: 14px;
+    padding: 10px 30px;
+    outline: none;
+}

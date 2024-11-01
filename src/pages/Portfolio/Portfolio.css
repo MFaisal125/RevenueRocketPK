@@ -1,0 +1,125 @@
+#portfolio-page {
+  padding: 50px 0;
+}
+
+#portfolio-page .title {
+  margin-bottom: 20px;
+}
+
+#portfolio-page .title h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#portfolio-page .underline {
+  width: 50px;
+  height: 4px;
+  background-color: #000;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+#portfolio-page .filter-container {
+  margin-bottom: 20px;
+}
+
+#portfolio-page .categories {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: start;
+}
+
+#portfolio-page .category {
+  margin: 0 10px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+#portfolio-page .category:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+#portfolio-page .card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 20px;
+}
+
+#portfolio-page .card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#portfolio-page .categories {
+  /* box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee; */
+  background: #fff;
+}
+
+#portfolio-page .categories li {
+  padding: 5px 10px;
+  background-color: #fff;
+  margin: 5px;
+  text-transform: capitalize;
+  font-weight: 500;
+  cursor: pointer;
+  transition: .2s linear;
+}
+
+#portfolio-page .categories .filter_item {
+  color: #111;
+  cursor: pointer;
+  border-radius: 5px;
+  background: linear-gradient(to right, #eff0f2, #fefefe);
+  box-shadow: 5px 0 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #fff;
+}
+
+#portfolio-page .categories .filter_item:hover {
+  background: #111 !important;
+  border: 2px solid #eee;
+  color: #fff !important;
+}
+
+#portfolio-page .portfolio_thumb {
+  transition: .5s ease-in-out;
+}
+
+#portfolio-page .portfolio_thumb:hover {
+  transform: scale(1.1);
+}
+
+#portfolio-page .card-container .social_link span img:hover {
+  background-color: white;
+  background-blend-mode: lighten;
+  border-radius: 30px;
+}
+
+.portfoli_details {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.portfoli_details p {
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+#portfolio-page .portfolio_item_box {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+
+#portfolio-page .portfolio_item_box .item {
+  margin: 10px;
+  background: linear-gradient(to right, #eff0f2, #fefefe);
+  box-shadow: 5px 0 8px rgba(0, 0, 0, 0.2);
+}

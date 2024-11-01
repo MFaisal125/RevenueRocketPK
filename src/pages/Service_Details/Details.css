@@ -1,0 +1,128 @@
+#service_details_page {
+    padding: 50px 0;
+}
+
+#service_details_page .s_details_wrapper {
+    padding: 30px 0;
+}
+
+#service_details_page .s_details_wrapper .actions_title {
+    font-size: 2.2rem;
+    text-transform: capitalize;
+    font-weight: bolder;
+}
+
+#service_details_page .s_details_wrapper .actions_desc {
+    font-size: 14px;
+    line-height: 30px;
+    text-transform: capitalize;
+}
+
+#service_details_page .s_details_wrapper h3 {
+    text-transform: capitalize;
+    font-weight: bolder;
+    padding: 10px 0;
+}
+
+#service_details_page .s_details_wrapper p {
+    text-transform: capitalize;
+    font-size: 14px;
+    padding: 10px 0;
+    letter-spacing: 1px;
+    font-weight: 400;
+    line-height: 25px;
+}
+
+#service_details_page .s_details_wrapper .technology_details {
+    padding: 30px 0;
+}
+
+#service_details_page .work_stratigy {
+    padding-top: 50px;
+}
+
+#service_details_page .work_stratigy .step_wrapper {
+    padding: 50px 0;
+}
+#service_details_page .work_stratigy .step_wrapper .step_item_box{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+}
+
+#service_details_page .work_stratigy .steps_item {
+    text-align: center;
+    padding: 15px;
+    box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee;
+    margin: 10px 0;
+    height: 100%;
+    position: relative;
+    border: 3px solid #eee;
+}
+
+#service_details_page .work_stratigy .steps_item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 0%;
+    background: blue;
+    transform: rotateY(145deg);
+    transition: .5s;
+    z-index: -1;
+}
+
+#service_details_page .work_stratigy .steps_item:hover::after {
+    height: 100%;
+    transform: rotateX(0deg);
+    top: 0;
+    right: 0;
+}
+
+#service_details_page .work_stratigy .steps_item:hover h4 {
+    color: #fff;
+    transition: .4s;
+}
+
+#service_details_page .work_stratigy .steps_item:hover p {
+    color: #fff;
+    transition: .4s;
+}
+
+#service_details_page .technology_details p {
+    line-height: 30px;
+}
+
+#service_details_page .work_stratigy .steps_item:hover img {
+    background-color: #fff;
+    border: 3px solid #eee;
+    padding: 5px;
+    border-radius: 5px;
+    transition: .4s;
+}
+
+#service_details_page .work_stratigy .steps_item img {
+    margin: 10px 0;
+}
+
+#service_details_page .work_stratigy .steps_item h4 {
+    font-size: 20px;
+    padding: 10px 0;
+    text-transform: capitalize;
+}
+
+#service_details_page .work_stratigy .steps_item p {
+    font-size: 12px;
+}
+#service_details_page .s_details_wrapper .actions_sections{
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+}
+#service_details_page .s_details_wrapper .actions_sections .action_right{
+    padding: 0 20px;
+}
+#service_details_page .s_details_wrapper .actions_sections .action_left img{
+    height: 100%;
+}

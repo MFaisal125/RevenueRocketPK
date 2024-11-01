@@ -1,0 +1,31 @@
+#props-banner {
+    width: 100%;
+    height: 80vh;
+}
+#props-banner h3{
+    position: absolute;
+    top: 35%;
+    z-index: 1;
+    user-select: none;
+    text-transform: uppercase;
+    color: transparent;
+    font-size: 3rem;
+    font-weight: bold;
+    transition: 1s;
+    -webkit-background-clip: text;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: #fff;
+    -webkit-text-fill-color: transparent;
+    background-image: url('https://media.giphy.com/media/1X7AJ2xjgkCzVwmSCG/giphy.gif');
+    background-position: 50%;
+    animation: bg 10s linear infinite;
+}
+#props-banner p{
+    color: #fff;
+    position: absolute;
+    bottom: 40vh;
+    text-align: center;
+    padding:20px ;
+    width: 50%;
+    text-transform: capitalize;
+}

@@ -1,0 +1,33 @@
+.blog-author{
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    padding-top: 10px;
+}
+.blog-author .blog_share {
+    padding: 1px;
+}
+
+.blog-author .blog_share span {
+    padding: 1px;
+    cursor: pointer;
+}
+
+.comment_form {
+    background: #fff;
+    padding: 20px;
+    box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee;
+}
+.comment_author{
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+.comment_author .comments_item{
+   margin: 10px 0;
+}
+.blog_author_name{
+    margin-top: 3px;
+    font-size: 18px;
+
+}

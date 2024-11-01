@@ -1,0 +1,59 @@
+#calender {
+    padding-bottom: 50px;
+}
+
+.react-calendar {
+    width: 600px !important;
+    background-color: #fff !important;
+    border: none !important;
+    font-size: 14px;
+    box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee;
+}
+
+.react-calendar button {
+    font-size: 14px !important;
+}
+
+.react-calendar .react-calendar__navigation button {
+    background-color: #14b014 !important;
+}
+
+.react-calendar__navigation__arrow.react-calendar__navigation__next-button {
+    background-color: red !important;
+    color: #fff;
+}
+
+.react-calendar__navigation__arrow.react-calendar__navigation__next2-button,
+.react-calendar__navigation__arrow.react-calendar__navigation__prev2-button,
+.react-calendar__navigation__arrow.react-calendar__navigation__prev-button {
+    background-color: red !important;
+    color: #fff;
+}
+
+.meeting_form_wrapper {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.meeting_form_wrapper .meeting_form {
+    box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee;
+    background-color: #fff;
+    padding: 10px;
+}
+
+.meeting_form_wrapper .meeting_form .meeting_url_input::placeholder {
+    font-size: 14px;
+    text-transform: capitalize;
+}
+
+.meeting_form_wrapper .meeting_form .service_type {
+    text-transform: capitalize;
+}
+
+input.valid {
+    border-color: green;
+}
+
+input.invalid {
+    border-color: red;
+}

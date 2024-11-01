@@ -1,0 +1,46 @@
+#porduct-page{
+    padding:50px 0;
+}
+#porduct-page .title{
+    padding: 20px;
+}
+#porduct-page .title h3{
+    text-transform: uppercase;
+    text-align: left;
+    font-weight: 600;
+    color: #111;
+}
+#porduct-page .product_wrapper{
+    padding: 10px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: auto auto auto auto;
+}
+.product_wrapper .porduct_item{
+    padding: 10px;
+    background: linear-gradient(to right, #eff0f2, #fefefe);
+    box-shadow: 5px 0 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid #fff;
+    margin: 10px;
+}
+.product_wrapper .porduct_item img{
+    width: 100%;
+    height: auto;
+}
+.product_wrapper .porduct_item p{
+    padding: 10px 5px;
+}
+.product_wrapper .porduct_item button{
+    padding: 5px;
+    background:#fff;
+    color: #000;
+    text-transform: capitalize;
+    font-weight: 300;
+    text-align: center;
+    letter-spacing: 1px;
+    margin: 0 5px;
+}
+.product_wrapper .porduct_item button:hover{
+    background:#111;
+    color: #fff;
+}
