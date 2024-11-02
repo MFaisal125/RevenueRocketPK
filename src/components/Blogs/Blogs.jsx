@@ -43,16 +43,16 @@ const Blogs = () => {
       .toString()
       .toLowerCase()
       .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9-]/g, '')
-      .replace(/--+/g, '-')
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9-]/g, "")
+      .replace(/--+/g, "-");
   }
   function extractWordsFromTitle(title) {
     // Split the title into an array of words using space as the delimiter
-    const words = title.split(' ');
+    const words = title.split(" ");
 
     // Extract the first 2 to 4 words
-    const firstWords = words.slice(0, Math.min(words.length - 1, 7)).join(' ');
+    const firstWords = words.slice(0, Math.min(words.length - 1, 7)).join(" ");
 
     // Get the last word separately
     const lastWord = words[words.length - 1];
@@ -73,7 +73,8 @@ const Blogs = () => {
             our latest blogs
           </p>
           <h3 className="text-capitalize py-2">
-            <span style={{ color: "green" }}>Lenexit</span>'s Our latest blogs
+            <span style={{ color: "green" }}>Revenue Rocket</span>'s Our latest
+            blogs
           </h3>
         </div>
         <div className="blogs-wrapper">
@@ -98,7 +99,12 @@ const Blogs = () => {
                 {Data.slice(0, 3).map((item) => (
                   <div className="blog-card shadow p-3 m-3" key={item.id}>
                     <div className="blog-thumbnail">
-                      <img src={item.thumbnail} className="img-fluid " title={item.title} alt={item.title} />
+                      <img
+                        src={item.thumbnail}
+                        className="img-fluid "
+                        title={item.title}
+                        alt={item.title}
+                      />
                       <div
                         className="blog-author mt-3 d-flex"
                         style={{ justifyContent: "start" }}
@@ -117,7 +123,7 @@ const Blogs = () => {
                       <h3 style={{ fontSize: "18px", marginTop: "15px" }}>
                         <NavLink
                           className="text-dark text-dark"
-                          to={"blog/" + item.id + '/' + Slugs(item.title)}
+                          to={"blog/" + item.id + "/" + Slugs(item.title)}
                         >
                           {extractWordsFromTitle(item.title)}
                         </NavLink>
@@ -125,9 +131,12 @@ const Blogs = () => {
                     </div>
                     <div className="content">
                       <p>
-                        {
-                          item.descrioption.replace(/<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm, '').slice(0, 150)
-                        }
+                        {item.descrioption
+                          .replace(
+                            /<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm,
+                            ""
+                          )
+                          .slice(0, 150)}
                         {/* <div
                           dangerouslySetInnerHTML={{
                             __html: item.descrioption.slice(50, 150),
