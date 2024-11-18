@@ -88,7 +88,6 @@ const Footer = () => {
                   style={{
                     width: "300px",
                     height: "100%",
-                    filter: "brightness(1.5) saturate(14.5)",
                   }}
                   alt="Desktop Application Development"
                 />
@@ -229,7 +228,7 @@ const Footer = () => {
                 <button
                   className="btn text-white"
                   onClick={FooterEmailSubmitHandler}
-                  style={{ background: "blue" }}
+                  style={{ background: "#ee834f" }}
                 >
                   Submit
                 </button>

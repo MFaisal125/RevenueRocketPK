@@ -67,14 +67,14 @@ const Blogs = () => {
       <div className="container">
         <div className="title">
           <p
-            className="title-badge text-white text-uppercase bg-success p-1 d-inline"
+            className="title-badge text-white text-uppercase rounded-lg bg-success p-1 d-inline"
             style={{ fontSize: "12px" }}
           >
             our latest blogs
           </p>
           <h3 className="text-capitalize py-2">
-            <span style={{ color: "green" }}>Revenue Rocket</span>'s Our latest
-            blogs
+            <span style={{ color: "#ed854f" }}>Revenue Rocket</span>'s Our
+            latest blogs
           </h3>
         </div>
         <div className="blogs-wrapper">

@@ -67,15 +67,15 @@ const TeamSlider = () => {
           <div className="col-md-4">
             <div className="title">
               <p
-                className="title-badge text-white text-uppercase bg-success p-1 d-inline"
+                className="title-badge text-white text-uppercase rounded-lg bg-success p-1 d-inline"
                 style={{ fontSize: "12px" }}
               >
                 our teams
               </p>
               <h3 className="text-capitalize py-2">
                 {" "}
-                <span style={{ color: "green" }}>Revenue Rocket</span>'s Dynamic
-                Team Driving Digital Success
+                <span style={{ color: "#ed854f" }}>Revenue Rocket</span>'s
+                Dynamic Team Driving Digital Success
               </h3>
             </div>
             <p className="pt-3">

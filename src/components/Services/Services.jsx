@@ -37,14 +37,14 @@ const Services = () => {
       <div className="container">
         <div className="title">
           <p
-            className="title-badge text-white text-uppercase bg-success p-1 d-inline"
+            className="title-badge text-white text-uppercase rounded-lg bg-success p-1 d-inline"
             style={{ fontSize: "12px" }}
           >
             our high services
           </p>
           <h3 className="text-capitalize py-2">
             our Premium Services{" "}
-            <span style={{ color: "green" }}>Revenue Rocket</span>
+            <span style={{ color: "#ee814b" }}>Revenue Rocket</span>
           </h3>
         </div>
         <div className="service-box pt-4">
@@ -66,7 +66,7 @@ const Services = () => {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                <div className="service-card shadow">
+                <div className="service-card shadow-xl">
                   <div className="d-flex">
                     <img
                       title="full-stack web development"
@@ -80,7 +80,7 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3">
-                    Lenexit offers full-stack web development services,
+                    Revenue Rocket offers full-stack web development services,
                     delivering end-to-end solutions that encompass front-end and
                     back-end expertise for seamless digital experiences.
                   </p>
@@ -99,9 +99,10 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3">
-                    Lenexit specializes in desktop app development, delivering
-                    comprehensive solutions that encompass both front-end and
-                    back-end expertise for optimal user experiences.
+                    Revenue Rocket specializes in desktop app development,
+                    delivering comprehensive solutions that encompass both
+                    front-end and back-end expertise for optimal user
+                    experiences.
                   </p>
                 </div>
                 <div className="service-card shadow">
@@ -118,9 +119,9 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3">
-                    Lenexit excels in Android and iOS mobile app development,
-                    delivering intuitive and engaging applications that
-                    captivate users and drive business growth.
+                    Revenue Rocket excels in Android and iOS mobile app
+                    development, delivering intuitive and engaging applications
+                    that captivate users and drive business growth.
                   </p>
                 </div>
                 <div className="service-card shadow">
@@ -137,9 +138,9 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3" style={{ fontSize: "14px" }}>
-                    Lenexit offers professional penetration testing services to
-                    identify and address vulnerabilities, ensuring the security
-                    and resilience of your digital assets.
+                    Revenue Rocket offers professional penetration testing
+                    services to identify and address vulnerabilities, ensuring
+                    the security and resilience of your digital assets.
                   </p>
                 </div>
                 <div className="service-card shadow">
@@ -156,9 +157,9 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3" style={{ fontSize: "14px" }}>
-                    Lenexit provides captivating graphics design services that
-                    enhance brand identity and create visually appealing designs
-                    for a lasting impression.
+                    Revenue Rocket provides captivating graphics design services
+                    that enhance brand identity and create visually appealing
+                    designs for a lasting impression.
                   </p>
                 </div>
                 <div className="service-card shadow">
@@ -175,7 +176,7 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3" style={{ fontSize: "14px" }}>
-                    Lenexit offers effective SEO services to boost online
+                    Revenue Rocket offers effective SEO services to boost online
                     visibility, increase organic traffic, and improve search
                     engine rankings for long-term success.
                   </p>
@@ -194,9 +195,9 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3" style={{ fontSize: "14px" }}>
-                    Lenexit specializes in custom plugin development, creating
-                    tailored solutions that seamlessly integrate with your
-                    existing systems and enhance the functionality of your
+                    Revenue Rocket specializes in custom plugin development,
+                    creating tailored solutions that seamlessly integrate with
+                    your existing systems and enhance the functionality of your
                     website or application.
                   </p>
                 </div>
@@ -214,7 +215,7 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3" style={{ fontSize: "14px" }}>
-                    Lenexit excels in custom WordPress theme development,
+                    Revenue Rocket excels in custom WordPress theme development,
                     crafting unique and visually captivating designs that align
                     with your brand and provide a seamless user experience.
                   </p>
@@ -233,7 +234,7 @@ const Services = () => {
                     </h4>
                   </div>
                   <p className="pt-3" style={{ fontSize: "14px" }}>
-                    Lenexit specializes in ecommerce website development,
+                    Revenue Rocket specializes in ecommerce website development,
                     creating robust and user-friendly online stores that drive
                     sales and provide a seamless shopping experience for
                     customers.
@@ -245,7 +246,7 @@ const Services = () => {
           <div className="mt-5 ml-3">
             <button
               class="btn text-capitalize"
-              style={{ background: "blue", margin: "0" }}
+              style={{ background: "#ec8856", margin: "0" }}
               role="button"
             >
               <NavLink

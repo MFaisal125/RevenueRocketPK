@@ -4,8 +4,8 @@ import { Slide } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
 const spanStyle = {
   padding: "20px",
-  background: "#fff",
-  color: "#000000",
+  background: "#182d50",
+  color: "#fff",
 };
 
 const divStyle = {
@@ -15,7 +15,7 @@ const divStyle = {
   margin: "10px 0",
 };
 const shadow = {
-  boxShadow: "-2px -2px 5px #eee,2px 2px 5px #eee",
+  boxShadow: "-2px -2px 5px #ed854f,2px 2px 5px #ed854f",
 };
 const slideImage = [
   {
@@ -47,14 +47,14 @@ const TimeLine = () => {
           <div className="col-md-6 col-sm col-lg-6">
             <div className="title">
               <p
-                className="title-badge text-white text-uppercase bg-success p-1 d-inline"
+                className="title-badge text-white text-uppercase rounded-lg bg-success p-1 d-inline"
                 style={{ fontSize: "12px" }}
               >
                 5 Steps To Success
               </p>
               <h3 className="text-capitalize py-2">
-                Efficient Workflow: 5 Steps to Success with Comprehensive
-                Development Process{" "}
+                <span style={{ color: "#ed854f" }}>Efficient Workflow: </span> 5
+                Steps to Success with Comprehensive Development Process{" "}
               </h3>
             </div>
             <p>
@@ -77,7 +77,7 @@ const TimeLine = () => {
                   <div key={index} className="p-3" style={shadow}>
                     <div style={divStyle}>
                       <h2
-                        className="text-capitalize text-dark"
+                        className="text-capitalize text-primary"
                         style={{ fontSize: "20px", paddingLeft: "20px" }}
                       >
                         {slideImage.title}

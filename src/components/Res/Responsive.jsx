@@ -12,14 +12,14 @@ const Responsive = () => {
             <div className="py-3">
               <div className="title">
                 <p
-                  className="title-badge text-white text-uppercase bg-success p-1 d-inline"
+                  className="title-badge text-white text-uppercase rounded-lg bg-success p-1 d-inline"
                   style={{ fontSize: "12px" }}
                 >
                   Our Design
                 </p>
                 <h3 className="text-capitalize py-2">
                   Engaging, Adaptive, and User-Friendly Solutions by{" "}
-                  <span style={{ color: "green" }}>Revenue Rocket</span>
+                  <span style={{ color: "#ed854f" }}>Revenue Rocket</span>
                 </h3>
               </div>
               <p className="text-capitalize pt-3">

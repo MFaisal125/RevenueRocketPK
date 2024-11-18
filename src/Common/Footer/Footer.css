@@ -1,6 +1,6 @@
 footer {
   padding: 50px 0;
-  background: linear-gradient(10deg, rgb(0 23 245 / 45%), #333),
+  background: linear-gradient(10deg, rgba(20, 26, 81, 0.45), #182b4c),
     url("../../assets/image/footer-bg.png");
   width: 100%;
 }
@@ -49,7 +49,7 @@ footer .footer_box .footer-item {
 }
 
 footer .footer_wrapper .footer-item .footer_last_social_item:hover {
-  background-color: blue;
+  background-color: #ee834f;
   border-radius: 5px;
   width: 100%;
 }

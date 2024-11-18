@@ -1,6 +1,7 @@
 import React from "react";
 import welcomeVideo from "../../assets/video/welcome-plants.mp4";
 import aboutusVideo from "../../assets/video/about-us.mp4";
+import aboutusVideo1 from "../../assets/video/about-us1.mp4";
 import welcomeVideo_Banner from "../../assets/video/welcome_video_banner.jpg";
 import teamVideo_banner from "../../assets/video/team_video_banner.jpg";
 import "./About.css";
@@ -29,11 +30,20 @@ const About = () => {
               className="img-fluid"
               title="the power of technology Revenue Rocket.com"
             ></video>
+            <video
+              poster={teamVideo_banner}
+              autoPlay
+              muted
+              loop
+              src={aboutusVideo1}
+              className="img-fluid"
+              title="the power of technology Revenue Rocket.com"
+            ></video>
           </div>
           <div className="col-md-8 col-sm col-lg-8">
             <div className="title">
               <p
-                className="title-badge text-white text-uppercase bg-success p-1 d-inline"
+                className="title-badge text-white text-uppercase rounded-lg bg-success p-1 d-inline"
                 style={{ fontSize: "12px" }}
               >
                 who we are
@@ -43,7 +53,7 @@ const About = () => {
                 style={{ fontSize: "3rem", fontWeight: "bold" }}
               >
                 welcome to the{" "}
-                <span style={{ color: "green" }}>Revenue Rocket</span>
+                <span style={{ color: "#ed8652" }}>Revenue Rocket</span>
               </h3>
             </div>
             <p style={{ fontSize: "14px", padding: "5px" }}>
