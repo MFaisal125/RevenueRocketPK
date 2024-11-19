@@ -24,7 +24,7 @@
 
 .client_card .client_item {
   transition: 0.5s;
-  border: 2px solid #ed854f;
+  border: 1px solid #ed854f;
   border-radius: 10px;
 }
 

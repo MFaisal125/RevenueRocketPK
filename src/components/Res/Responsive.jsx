@@ -48,7 +48,7 @@ const Responsive = () => {
                 muted
                 loop
                 security="true"
-                className="img-fluid"
+                className="img-fluid rounded-lg"
               >
                 <source src={responsive_video} type="video/mp4" />
               </video>
