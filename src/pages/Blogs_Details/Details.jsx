@@ -104,7 +104,7 @@ const Details = () => {
       })
         .then((response) => response.json())
         .then((result) => {
-          console.log(result['message'])
+          console.log(result["message"]);
           alert_message("Thanks For Your Comment");
           setUserName("");
           setEmail("");
@@ -133,15 +133,15 @@ const Details = () => {
       .toString()
       .toLowerCase()
       .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9-]/g, '')
-      .replace(/--+/g, '-')
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9-]/g, "")
+      .replace(/--+/g, "-");
   }
   function extractWordsFromTitle1(title) {
     // Split the title into an array of words using space as the delimiter
-    const words = title.split(' ');
+    const words = title.split(" ");
     // Extract the first 2 to 4 words
-    const firstWords = words.slice(0, Math.min(words.length - 1, 2)).join(' ');
+    const firstWords = words.slice(0, Math.min(words.length - 1, 2)).join(" ");
     // Get the last word separately
     const lastWord = words[words.length - 1];
     // Concatenate the first words and the last word
@@ -150,7 +150,7 @@ const Details = () => {
   }
   return (
     <>
-      <Header tags={location.href}/>
+      <Header tags={location.href} />
       <section id="details">
         <div className="container">
           <div className="row">
@@ -176,14 +176,22 @@ const Details = () => {
                         />
                         <div className="blog_author_name pl-2">
                           <p className="p-0 m-0 blog_author_name">
-                            Mustafa Khan
+                            Muhammad Faisal
                           </p>
                         </div>
                       </div>
                       <div className="blog_share">
                         <span
                           onClick={() =>
-                            whatsappShare(item.title, item.descrioption.replace(/<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm, '').slice(0, 150))
+                            whatsappShare(
+                              item.title,
+                              item.descrioption
+                                .replace(
+                                  /<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm,
+                                  ""
+                                )
+                                .slice(0, 150)
+                            )
                           }
                         >
                           <img
@@ -195,7 +203,15 @@ const Details = () => {
                         </span>
                         <span
                           onClick={() =>
-                            FaceBookShare(item.title, item.descrioption.replace(/<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm, '').slice(0, 150))
+                            FaceBookShare(
+                              item.title,
+                              item.descrioption
+                                .replace(
+                                  /<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm,
+                                  ""
+                                )
+                                .slice(0, 150)
+                            )
                           }
                         >
                           <img
@@ -207,7 +223,15 @@ const Details = () => {
                         </span>
                         <span
                           onClick={() =>
-                            twitterShare(item.title, item.descrioption.replace(/<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm, '').slice(0, 150))
+                            twitterShare(
+                              item.title,
+                              item.descrioption
+                                .replace(
+                                  /<\/?(?!\/?(?:${allowedTags.join('|')}))[^>]*\/?>/gm,
+                                  ""
+                                )
+                                .slice(0, 150)
+                            )
                           }
                         >
                           <img
@@ -319,7 +343,12 @@ const Details = () => {
                       recent post
                     </h3>
                     <div className="">
-                      <img className="img-fluid" src={items.thumbnail} alt={items.title} title={items.title} />
+                      <img
+                        className="img-fluid"
+                        src={items.thumbnail}
+                        alt={items.title}
+                        title={items.title}
+                      />
                     </div>
                   </div>
                 ))}
@@ -352,11 +381,13 @@ const Details = () => {
                           })}
                         </p>
                         <p clssName="m-0 p-0">
-                          <NavLink 
+                          <NavLink
                             className="text-dark"
-                            to={"/blog/" + item.id + '/' + Slugs(item.title)}
+                            to={"/blog/" + item.id + "/" + Slugs(item.title)}
                           >
-                            <b className="blog_details_right_side_card_title">{extractWordsFromTitle1(item.title)}</b>
+                            <b className="blog_details_right_side_card_title">
+                              {extractWordsFromTitle1(item.title)}
+                            </b>
                           </NavLink>
                         </p>
                       </div>

@@ -4,9 +4,11 @@ import "../../assets/css/media-query.css";
 import Footer from "../../Common/Footer/Footer";
 import Header from "../../Common/Header/Headers";
 import Banners from "../../Common/Banners/Banner";
+import ourMission from "../../assets/image/our-mission-01.mp4";
+import ourVission from "../../assets/image/our-vision-01.mp4";
 import company_logo from "../../assets/vai/company_logo.png";
-import ourVission from "../../assets/image/our-vision-01.png";
-import ourMission from "../../assets/image/our-mission-01.png";
+import ourVission1 from "../../assets/image/our-vision-011.png";
+import ourMission1 from "../../assets/image/our-mission-011.png";
 import about_image from "../../assets/image/about_image.png";
 import touhid from "../../assets/image/touhid.jpg";
 
@@ -136,28 +138,28 @@ const About = () => {
                       businesses we serve, enabling them to thrive in a
                       competitive landscape.
                     </p>
-                    <img
-                      src={ourMission}
+                    <video
+                      poster={ourMission1}
                       title="our mission is to empower businesses"
-                      style={{
-                        background: "white",
-                        filter: "hue-rotate(173deg)",
-                      }}
+                      autoPlay
+                      muted
+                      loop
+                      src={ourMission}
                       className="img-fluid"
                       alt="our mission"
-                    />
+                    ></video>
                   </div>
                   <div className="visionmision_image_wraper">
-                    <img
-                      title="Our vision is to be a leading provider"
+                    <video
+                      poster={ourVission1}
+                      title="our vision is to be a leading provider"
+                      autoPlay
+                      muted
+                      loop
                       src={ourVission}
-                      style={{
-                        background: "white",
-                        filter: "hue-rotate(173deg)",
-                      }}
                       className="img-fluid"
-                      alt="Our vision"
-                    />
+                      alt="our vision"
+                    ></video>
                     <p>
                       Our vision is to be a leading provider of cutting-edge
                       technology solutions, recognized for our commitment to
