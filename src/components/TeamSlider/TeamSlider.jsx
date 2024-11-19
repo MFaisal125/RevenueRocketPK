@@ -53,10 +53,10 @@ const TeamSlider = () => {
                       className="img-fluid"
                       alt={item.designation}
                     />
-                    <h5 className="text-capitalize text-dark text-center m-0 p-0 pt-3">
+                    <h5 className="text-capitalize text-white text-center m-0 p-0 pt-3">
                       {item.name}
                     </h5>
-                    <p className="text-capitalize text-dark text-center m-0 p-0 pb-3">
+                    <p className="text-capitalize text-white text-center m-0 p-0 pb-3">
                       {item.designation}
                     </p>
                   </div>
