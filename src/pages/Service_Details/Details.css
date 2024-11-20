@@ -57,7 +57,7 @@
   margin: 10px 0;
   height: 100%;
   position: relative;
-  border: 3px solid #eee;
+  border: 2px solid #eee;
 }
 
 #service_details_page .work_stratigy .steps_item::after {
@@ -104,6 +104,8 @@
 
 #service_details_page .work_stratigy .steps_item img {
   margin: 10px 0;
+  background-color: #fff;
+  border-radius: 20px;
 }
 
 #service_details_page .work_stratigy .steps_item h4 {

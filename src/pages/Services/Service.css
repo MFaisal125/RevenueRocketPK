@@ -53,6 +53,11 @@
   transform: rotateY(0deg);
   transition: 0.4s;
 }
+#services-page .service-box .service-card img {
+  background-color: white;
+  background-blend-mode: lighten;
+  border-radius: 2dvh;
+}
 
 #services-page .service-box .service-card:hover img {
   background: #fff;

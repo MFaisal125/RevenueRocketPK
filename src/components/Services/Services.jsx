@@ -69,6 +69,7 @@ const Services = () => {
                 <div className="service-card shadow-xl">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       title="full-stack web development"
                       width="50"
                       height="50"
@@ -88,6 +89,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       title="Desktop application development"
                       width="50"
                       height="50"
@@ -108,6 +110,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       title="android & ios mobile app development"
                       width="50"
                       height="50"
@@ -127,6 +130,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       title="website penetration testing"
                       width="50"
                       height="50"
@@ -146,6 +150,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       width="50"
                       title="graphics design"
                       height="50"
@@ -165,6 +170,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       width="64"
                       height="64"
                       title="search engine optimization (SEO)"
@@ -184,6 +190,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       width="50"
                       height="50"
                       src={pluginIcon}
@@ -204,6 +211,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       width="50"
                       height="50"
                       src={wordpressIcon}
@@ -223,6 +231,7 @@ const Services = () => {
                 <div className="service-card shadow">
                   <div className="d-flex">
                     <img
+                      className="bg-white"
                       width="50"
                       height="50"
                       src={cmsIcon}

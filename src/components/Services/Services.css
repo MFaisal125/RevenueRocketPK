@@ -45,11 +45,14 @@
   opacity: 1;
   transition: 0.4s;
 }
+#services .service-box .service-card img {
+  border-radius: 2dvh;
+}
 
 #services .service-box .service-card:hover img {
   background: #fff;
   border-radius: 5dvh;
-  border: 3px solid #ee814b;
+  border: 2px solid #eee;
   background-position: center;
   transition: 0.4s;
   background-size: cover;

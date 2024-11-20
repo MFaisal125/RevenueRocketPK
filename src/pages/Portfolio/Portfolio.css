@@ -98,9 +98,14 @@
   transform: scale(1.1);
   border-radius: 20px;
 }
+#portfolio-page .card-container .social_link span img {
+  background-color: white;
+  background-blend-mode: lighten;
+  border-radius: 30px;
+}
 
 #portfolio-page .card-container .social_link span img:hover {
-  background-color: white;
+  background-color: #192d4f;
   background-blend-mode: lighten;
   border-radius: 30px;
 }
