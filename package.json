@@ -1,8 +1,8 @@
 {
-  "name": "lenex-web",
+  "name": "Revenue Rocket",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://lenexit.com",
+  "homepage": "https://revenue-rocket-pk.vercel.app",
   "type": "module",
   "scripts": {
     "dev": "vite",
