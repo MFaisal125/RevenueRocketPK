@@ -74,7 +74,7 @@ export const Home = () => {
                 <p>
                   We Specialize In Creating Customized Solutions Tailored To
                   Your Specific Goals. With Our Expert Team, You Can Expect
-                  Innovative Strategies And Cutting-Edge Tactics Designed To
+                  Innovative Strategies And Cutting-Edge and Tactics Designed To
                   Deliver The Results You Need To Succeed In Today's Digital
                   Landscape.
                 </p>
