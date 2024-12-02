@@ -40,14 +40,14 @@
 
 #wrape_section .founder_box .founder_info .founder_one {
   padding: 10px;
-  box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee;
-  border: 2px solid #eee;
+  box-shadow: -2px -2px 5px #ec864f, 2px 2px 5px #ec864f;
+  border: 2px solid #ec864f;
 }
 
 #wrape_section .founder_box .founder_info .founder_tow {
   padding: 10px;
-  box-shadow: -2px -2px 5px #eee, 2px 2px 5px #eee;
-  border: 2px solid #eee;
+  box-shadow: -2px -2px 5px #ec864f, 2px 2px 5px #ec864f;
+  border: 2px solid #ec864f;
 }
 
 #wrape_section .founder_box .founder_info .founder_one img {
