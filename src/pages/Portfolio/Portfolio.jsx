@@ -64,16 +64,7 @@ export const Portfolio = () => {
                         justifyContent: "space-between",
                       }}
                     >
-                      <span>
-                        <NavLink to={item.github_url}>
-                          <img
-                            width="30"
-                            height="30"
-                            src={githubIcon}
-                            alt="github"
-                          />
-                        </NavLink>
-                      </span>
+                      <span></span>
                       <span>
                         <NavLink to={item.live_url}>
                           <img
@@ -85,20 +76,22 @@ export const Portfolio = () => {
                         </NavLink>
                       </span>
                     </div>
-                    <img
-                      title={item.title}
-                      className="portfolio_thumb"
-                      src={item.thumbnail}
-                      style={{ width: "100%", height: "200px" }}
-                      alt={item.title}
-                    />
+                    <NavLink to={item.live_url}>
+                      <img
+                        title={item.title}
+                        className="portfolio_thumb"
+                        src={item.thumbnail}
+                        style={{ width: "100%", height: "200px" }}
+                        alt={item.title}
+                      />
+                    </NavLink>
                     <div className="details">
                       <div className="description">
                         <p
                           style={{ fontSize: "16px" }}
                           className="m-0 p-0 p-1 font-weight-bold pt-3 text-left text-capitalize"
                         >
-                          {item.title.slice(0, 50)}
+                          {item.title.slice(0, 90)}
                         </p>
                       </div>
                     </div>

@@ -5,43 +5,42 @@ import image4 from "../../assets/image/portfolio_image/p16.jpg";
 export const portfolioData = [
   {
     id: "1",
-    github_url: "https://github.com/MonabbirHasan/metaportal",
-    live_url: "https://monabbirhasan.github.io/metaportal/",
-    category: "custom website",
+    live_url: "https://e-commerce-myapplication.vercel.app/",
+    category: "E-Commerce",
     title:
-      "meta portal user can be travel any ware any country just using our website",
+      "E-Commerce is your Ultimate Online Destination for Everyday Essentials and Lifestyle Needs",
     thumbnail: `${image1}`,
     description:
-      "Let’s face it, everyone loves to travel, but not many like to make travel pages. We decided to create travel website templates that will save you a ton of time while you travel around. Here, you can find website templates for travel agencies, blogs, hotels, directories, villas, informative sites, and so much",
+      "Discover a vast range of products, from electronics to fashion and home essentials, all in one place. Enjoy hassle-free shopping with secure payments, fast delivery, and excellent customer service. Whether upgrading your lifestyle or finding daily necessities, ShopSphere has you covered.",
   },
   {
     id: "15",
-    github_url: "https://github.com/MonabbirHasan/fantasyfocus_php_webiste",
-    live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "custom website",
+
+    live_url: "https://next-e-commerce1.vercel.app/",
+    category: "E-Commerce",
     title:
-      "this is movie website user can see movie any ware any country just using our website",
+      "E-Commerce is redefining Fashion with Curated Collections for Every Occasion",
     thumbnail: `${image2}`,
     description:
-      "Let’s face it, everyone loves to travel, but not many like to make travel pages. We decided to create travel website templates that will save you a ton of time while you travel around. Here, you can find website templates for travel agencies, blogs, hotels, directories, villas, informative sites, and so much",
+      "Explore the latest trends in clothing, accessories, and footwear crafted for all styles and preferences. Stay ahead of the curve with exclusive deals and timeless pieces delivered to your doorstep. StyleSavvy makes fashion accessible, ensuring you always look and feel your best.",
   },
   {
     id: "16",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "custom website",
+
+    live_url: "https://e-commerce125.vercel.app/",
+    category: "E-Commerce",
     title:
-      "travel website user can be travel any ware any country just using our website",
+      "Next-Gen Technology and Innovative Services for Every E-Commerce or Tech Lover",
     thumbnail: `${image3}`,
     description:
-      "Let’s face it, everyone loves to travel, but not many like to make travel pages. We decided to create travel website templates that will save you a ton of time while you travel around. Here, you can find website templates for travel agencies, blogs, hotels, directories, villas, informative sites, and so much",
+      "Dive into the world of advanced electronics, smart gadgets, and premium accessories at great prices. Shop confidently with reliable warranties, fast shipping, and a customer-first approach. GadgetGrid keeps you connected to the future with tech that enhances your everyday life.",
   },
 
   {
     id: "2",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "mobile app",
+    category: "Hotel Websites",
     title: "news website for bbc news tv channel this high power website",
     thumbnail: `${image4}`,
     description:
@@ -49,9 +48,9 @@ export const portfolioData = [
   },
   {
     id: "13",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "mobile app",
+    category: "Hotel Websites",
     title: "news website for bbc news tv channel this high power website",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -60,9 +59,9 @@ export const portfolioData = [
   },
   {
     id: "14",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "mobile app",
+    category: "Hotel Websites",
     title: "news website for bbc news tv channel this high power website",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -72,9 +71,9 @@ export const portfolioData = [
 
   {
     id: "3",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "desktop app",
+    category: "Portfolios",
     title: "personal blogging website for my sister she is wonderfull girl",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -83,9 +82,9 @@ export const portfolioData = [
   },
   {
     id: "11",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "desktop app",
+    category: "Portfolios",
     title: "personal blogging website for my sister she is wonderfull girl",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -94,9 +93,9 @@ export const portfolioData = [
   },
   {
     id: "12",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "desktop app",
+    category: "Portfolios",
     title: "personal blogging website for my sister she is wonderfull girl",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -105,9 +104,9 @@ export const portfolioData = [
   },
   {
     id: "4",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "graphic design",
+    category: "Custom Websites",
     title: "Hairnic is a free single product website template crafted",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -116,9 +115,9 @@ export const portfolioData = [
   },
   {
     id: "17",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "graphic design",
+    category: "Custom Websites",
     title: "Hairnic is a free single product website template crafted",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -127,9 +126,9 @@ export const portfolioData = [
   },
   {
     id: "18",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "graphic design",
+    category: "Custom Websites",
     title: "Hairnic is a free single product website template crafted",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/05/single-product-website-template.jpg?resize=740%2C463&ssl=1",
@@ -138,45 +137,45 @@ export const portfolioData = [
   },
   {
     id: "5",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "wp plugin",
+    category: "Shopify",
     title:
       "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/06/it-solutions-website-template.jpg?resize=740%2C463&ssl=1",
     description:
-      "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT solutions, perfectly suited for digital agencies. It has been specifically designed to cater to the requirements of startup digital agencies, IT solutions companies, SEO agencies, graphic design firms, creative agencies, web design & development agencies, online marketing agencies, SEO services providers, content marketing, consulting & financial agencies, as well as all other internet marketing and service-related agencies and businesses",
+      "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT solutions, perfectly suited for digital agencies. It has been specifically designed to cater to the requirements of startup digital agencies, IT solutions companies, SEO agencies, Custom Websites firms, creative agencies, web design & development agencies, online marketing agencies, SEO services providers, content marketing, consulting & financial agencies, as well as all other internet marketing and service-related agencies and businesses",
   },
   {
     id: "19",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "wp plugin",
+    category: "Shopify",
     title:
       "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/06/it-solutions-website-template.jpg?resize=740%2C463&ssl=1",
     description:
-      "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT solutions, perfectly suited for digital agencies. It has been specifically designed to cater to the requirements of startup digital agencies, IT solutions companies, SEO agencies, graphic design firms, creative agencies, web design & development agencies, online marketing agencies, SEO services providers, content marketing, consulting & financial agencies, as well as all other internet marketing and service-related agencies and businesses",
+      "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT solutions, perfectly suited for digital agencies. It has been specifically designed to cater to the requirements of startup digital agencies, IT solutions companies, SEO agencies, Custom Websites firms, creative agencies, web design & development agencies, online marketing agencies, SEO services providers, content marketing, consulting & financial agencies, as well as all other internet marketing and service-related agencies and businesses",
   },
   {
     id: "20",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "wp plugin",
+    category: "Shopify",
     title:
       "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT",
     thumbnail:
       "https://i0.wp.com/htmlcodex.com/wp-content/uploads/2023/06/it-solutions-website-template.jpg?resize=740%2C463&ssl=1",
     description:
-      "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT solutions, perfectly suited for digital agencies. It has been specifically designed to cater to the requirements of startup digital agencies, IT solutions companies, SEO agencies, graphic design firms, creative agencies, web design & development agencies, online marketing agencies, SEO services providers, content marketing, consulting & financial agencies, as well as all other internet marketing and service-related agencies and businesses",
+      "HighTech is a meticulously crafted, creative, and modern free HTML website template for IT solutions, perfectly suited for digital agencies. It has been specifically designed to cater to the requirements of startup digital agencies, IT solutions companies, SEO agencies, Custom Websites firms, creative agencies, web design & development agencies, online marketing agencies, SEO services providers, content marketing, consulting & financial agencies, as well as all other internet marketing and service-related agencies and businesses",
   },
   {
     id: "6",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "wp theme",
+    category: "CRM Softwares",
     title:
       "Labsky is a free HTML website template designed for laboratory and science research-related businesses. ",
     thumbnail:
@@ -186,9 +185,9 @@ export const portfolioData = [
   },
   {
     id: "21",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "wp theme",
+    category: "CRM Softwares",
     title:
       "Labsky is a free HTML website template designed for laboratory and science research-related businesses. ",
     thumbnail:
@@ -198,9 +197,9 @@ export const portfolioData = [
   },
   {
     id: "22",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "wp theme",
+    category: "CRM Softwares",
     title:
       "Labsky is a free HTML website template designed for laboratory and science research-related businesses. ",
     thumbnail:
@@ -210,9 +209,9 @@ export const portfolioData = [
   },
   {
     id: "7",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "website",
+    category: "Website",
     title:
       "travel website user can be travel any ware any country just using our website",
     thumbnail:
@@ -222,9 +221,9 @@ export const portfolioData = [
   },
   {
     id: "8",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "website",
+    category: "Website",
     title:
       "travel website user can be travel any ware any country just using our website",
     thumbnail:
@@ -234,9 +233,9 @@ export const portfolioData = [
   },
   {
     id: "10",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "website",
+    category: "Website",
     title:
       "travel website user can be travel any ware any country just using our website",
     thumbnail:
@@ -246,9 +245,9 @@ export const portfolioData = [
   },
   {
     id: "9",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "cms website",
+    category: "POS Website",
     title:
       "travel website user can be travel any ware any country just using our website",
     thumbnail:
@@ -258,9 +257,9 @@ export const portfolioData = [
   },
   {
     id: "23",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "cms website",
+    category: "POS Website",
     title:
       "travel website user can be travel any ware any country just using our website",
     thumbnail:
@@ -270,9 +269,9 @@ export const portfolioData = [
   },
   {
     id: "25",
-    github_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
+
     live_url: "https://monabbirhasan.github.io/FantasyFocus.com/",
-    category: "cms website",
+    category: "POS Website",
     title:
       "travel website user can be travel any ware any country just using our website",
     thumbnail:
