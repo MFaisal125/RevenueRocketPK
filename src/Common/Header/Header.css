@@ -58,6 +58,7 @@ header .react_navbar a {
 header .dropdown-item:focus,
 .dropdown-item:hover {
     color: #000 !important;
+    background-color: #ee834d;
 } */
 .navbar-toggler {
   background-color: #fff;
@@ -66,4 +67,7 @@ header .dropdown-item:focus,
 
   box-shadow: #ee834d 0px 0px 5px, #ee834d 0px 0px 5px, #ee834d 0px 0px 5px,
     #ee834d 0px 0px 5px, #ee834d 0px 0px 5px;
+}
+.navbar-toggler:hover {
+  border: #ee834d solid 1px;
 }
