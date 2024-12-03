@@ -158,24 +158,7 @@ const Footer = () => {
                     alt="google-pay-india"
                   />
                 </span>
-                <span>
-                  <img
-                    title="pay with bitcoin"
-                    width="30"
-                    height="30"
-                    src={bitcoinIcon}
-                    alt="bitcoin"
-                  />
-                </span>
-                <span>
-                  <img
-                    title="pay with Binance"
-                    width="30"
-                    height="30"
-                    src={BinanceIcon}
-                    alt="Binance"
-                  />
-                </span>
+
                 <span>
                   <img
                     title="pay with rezorpy"
@@ -260,19 +243,6 @@ const Footer = () => {
                     />
                   </span>
                   <span
-                    title="Revenue Rocket facebook"
-                    style={{ cursor: "pointer" }}
-                    className="p-2 footer_last_social_item"
-                    onClick={() => FacebookWindow("https://www.facebook.com")}
-                  >
-                    <img
-                      width="30"
-                      height="30"
-                      src={facebookIcon}
-                      alt="facebook"
-                    />
-                  </span>
-                  <span
                     title="Revenue Rocket instagram"
                     style={{ cursor: "pointer" }}
                     className="p-2 footer_last_social_item"
@@ -285,19 +255,7 @@ const Footer = () => {
                       alt="instagram"
                     />
                   </span>
-                  <span
-                    title="Revenue Rocket twitter"
-                    style={{ cursor: "pointer" }}
-                    className="p-2 footer_last_social_item"
-                    onClick={() => TwitterWindow("https://twitter.com")}
-                  >
-                    <img
-                      width="30"
-                      height="30"
-                      src={twitterIcon}
-                      alt="twitter"
-                    />
-                  </span>
+
                   <span
                     title="Revenue Rocket email"
                     style={{ cursor: "pointer" }}

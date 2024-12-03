@@ -59,7 +59,7 @@ footer .footer_wrapper .footer-item .footer_last_social_item:hover {
   margin: 5px;
   background-color: #eee;
   border-radius: 5px;
-  filter: brightness(0.8) grayscale(70);
+  filter: brightness(0.9) grayscale(0);
   cursor: pointer;
 }
 
