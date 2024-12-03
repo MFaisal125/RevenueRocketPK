@@ -63,4 +63,7 @@ header .dropdown-item:focus,
   background-color: #fff;
   margin-right: -12px;
   padding: 2px 6px;
+
+  box-shadow: #ee834d 0px 0px 5px, #ee834d 0px 0px 5px, #ee834d 0px 0px 5px,
+    #ee834d 0px 0px 5px, #ee834d 0px 0px 5px;
 }
