@@ -61,4 +61,6 @@ header .dropdown-item:focus,
 } */
 .navbar-toggler {
   background-color: #fff;
+  margin-right: -12px;
+  padding: 2px 6px;
 }

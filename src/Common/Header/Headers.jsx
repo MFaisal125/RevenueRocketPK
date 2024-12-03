@@ -46,7 +46,7 @@ const Headers = ({ tags }) => {
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse
                 id="basic-navbar-nav"
-                className="justify-content-end nav_menu"
+                className="justify-content-end"
               >
                 <Nav className="m-auto">
                   <Nav.Link>
