@@ -59,7 +59,7 @@ const Headers = ({ tags }) => {
                     <NavLink to={"/service"}>Services</NavLink>
                   </Nav.Link>
                   <Nav.Link>
-                    <NavLink to={"/portfolio"}>Our Works</NavLink>
+                    <NavLink to={"/portfolio"}>Portfolio</NavLink>
                   </Nav.Link>
                   <Nav.Link>
                     <NavLink to={"/blogs"}>Blogs</NavLink>
