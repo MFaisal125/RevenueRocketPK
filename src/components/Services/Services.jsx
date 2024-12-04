@@ -198,7 +198,7 @@ const Services = () => {
                       alt="custom plugin development"
                     />
                     <h4 className="pl-4 text-capitalize service_card_title">
-                      custom plugin development
+                      Shopify development
                     </h4>
                   </div>
                   <p className="pt-3" style={{ fontSize: "14px" }}>

@@ -398,13 +398,14 @@ export const serviceData = [
   {
     service_id: "7",
     card_icons: pluginIcon,
-    card_title: "Custom Plugin Development",
-    card_description: `Revenue Rocket specializes in custom plugin development, creating tailored solutions that seamlessly integrate with your existing systems and enhance the functionality of your website or application.`,
-    service_title: "Our Custom Plugin Development service",
-    action_title: "develop  a new powerful plugin with your requirments",
-    action_desc: `Revenue Rocket specializes in providing top-notch custom plugin development services, empowering businesses to enhance the functionality and extend the capabilities of their websites or web applications. Our experienced team of developers excels in creating tailored plugins that seamlessly integrate with various platforms and frameworks.
-        We understand that every business has unique requirements and objectives. Our custom plugin development service is designed to address these specific needs and provide a customized solution that aligns perfectly with your business goals.`,
-    service_sub_title: `Revenue Rocket specializes in custom plugin development, creating tailored solutions that seamlessly integrate with your existing systems and enhance the functionality of your website or application.`,
+    card_title: "Shopify Development",
+    card_description: `Revenue Rocket specializes in Shopify Development, creating tailored solutions that seamlessly integrate with your existing systems and enhance the functionality of your website or application.`,
+    service_title: "Our Shopify Development service",
+    action_title:
+      "develop  a new powerful Shopify plugin with your requirments",
+    action_desc: `Revenue Rocket specializes in providing top-notch Shopify Development services, empowering businesses to enhance the functionality and extend the capabilities of their websites or web applications. Our experienced team of developers excels in creating tailored plugins that seamlessly integrate with various platforms and frameworks.
+        We understand that every business has unique requirements and objectives. Our Shopify Development service is designed to address these specific needs and provide a customized solution that aligns perfectly with your business goals.`,
+    service_sub_title: `Revenue Rocket specializes in Shopify Development, creating tailored solutions that seamlessly integrate with your existing systems and enhance the functionality of your website or application.`,
     service__img: plugins,
     service_details: `Our plugin development process begins with a detailed understanding of your requirements. We collaborate closely with you to identify the functionalities and features you desire in the plugin. Whether it's enhancing the user experience, improving website performance, or adding custom functionalities, we ensure that the plugin serves its intended purpose effectively.
         Using the latest technologies and frameworks, our skilled developers meticulously code the plugin to deliver a robust and efficient solution. We adhere to coding best practices, ensuring the plugin is secure, scalable, and maintainable. We also conduct rigorous testing to ensure that the plugin performs flawlessly across different environments.
@@ -413,8 +414,8 @@ export const serviceData = [
         At Revenue Rocket, we believe in the power of collaboration and communication. Throughout the development process, we maintain transparent and regular communication with our clients. We provide updates, seek feedback, and ensure that the plugin development aligns with your expectations and requirements.
         Upon completion, we assist in the deployment and integration of the custom plugin into your website or application. Our team provides comprehensive documentation and support, ensuring a smooth transition and helping you maximize the benefits of the developed plugin.
         We also offer ongoing maintenance and support services to address any issues or updates that may arise with the custom plugin. Our team remains available to assist you in optimizing the plugin's performance, implementing enhancements, and ensuring its compatibility with future updates or changes in the environment.
-        With Revenue Rocket's custom plugin development service, you can unlock the full potential of your website or web application by adding bespoke functionalities that cater specifically to your business needs. Our dedication to quality, attention to detail, and commitment to client satisfaction make us the ideal partner for developing custom plugins that enhance your online presence and drive business success.`,
-    stps_title: "How Does Our Custom Plugin Development service Work?",
+        With Revenue Rocket's Shopify Development service, you can unlock the full potential of your website or web application by adding bespoke functionalities that cater specifically to your business needs. Our dedication to quality, attention to detail, and commitment to client satisfaction make us the ideal partner for developing custom plugins that enhance your online presence and drive business success.`,
+    stps_title: "How Does Our Shopify Development service Work?",
     stps_sub_title:
       "Work With Us For Tailored Solutions, Measurable Results, And Dedicated Support That Drives Your Business Forward.",
     steps: [
