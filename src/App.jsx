@@ -1,8 +1,5 @@
-import React, { useEffect } from 'react'
-import {
-  Route,
-  Routes,
-} from "react-router-dom";
+import React, { useEffect } from "react";
+import { Route, Routes } from "react-router-dom";
 import { Home } from "../src/pages/Home/Home";
 import Details from "../src/pages/Blogs_Details/Details";
 import About from "../src/pages/About/About";
@@ -21,21 +18,23 @@ function App() {
     fetch("https://api.lenexit.com/api/visitor", {
       method: "POST",
       headers: {
-        "Content-Type": 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ visitor: count })
-    }).then((response) => response.json()).then((result) => {
-      // console.log(result)
+      body: JSON.stringify({ visitor: count }),
     })
+      .then((response) => response.json())
+      .then((result) => {
+        // console.log(result)
+      });
   }
   var visitor_count = 0;
   useEffect(() => {
     const showCookieAlert = () => {
       visitor_count++;
-      user_visitor()
+      user_visitor();
     };
     showCookieAlert();
-  }, [])
+  }, []);
   return (
     <>
       <Routes>
@@ -51,7 +50,7 @@ function App() {
         {/* <Route path="*" element={<Error />} /> */}
       </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
