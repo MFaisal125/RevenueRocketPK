@@ -1,1 +1,1 @@
-this is a it company website building technologies.
+this is a building with AI technologies.
