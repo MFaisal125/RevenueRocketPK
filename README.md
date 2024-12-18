@@ -1,1 +1,1 @@
-this is a it company website building by mern-stack technologies.
+this is a it company website building Sass technologies.
