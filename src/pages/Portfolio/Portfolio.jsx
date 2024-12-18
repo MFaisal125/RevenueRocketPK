@@ -72,6 +72,7 @@ export const Portfolio = () => {
                             height="30"
                             src={domainIcon}
                             alt="domain"
+                            about="_blank"
                           />
                         </NavLink>
                       </span>

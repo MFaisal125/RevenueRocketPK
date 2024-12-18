@@ -2,7 +2,7 @@
   "name": "Revenue Rocket",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://www.revenuerocket.site",
+  "homepage": "https://www.revenuerocket.site/portfolio",
   "type": "module",
   "scripts": {
     "dev": "vite",
