@@ -66,24 +66,25 @@ export const Portfolio = () => {
                     >
                       <span></span>
                       <span>
-                        <NavLink to={item.live_url}>
+                        <NavLink to={item.live_url} target="_blank">
                           <img
                             width="30"
                             height="30"
                             src={domainIcon}
                             alt="domain"
-                            about="_blank"
+                            target="_blank"
                           />
                         </NavLink>
                       </span>
                     </div>
-                    <NavLink to={item.live_url}>
+                    <NavLink to={item.live_url} target="_blank">
                       <img
                         title={item.title}
                         className="portfolio_thumb"
                         src={item.thumbnail}
                         style={{ width: "100%", height: "200px" }}
                         alt={item.title}
+                        target="_blank"
                       />
                     </NavLink>
                     <div className="details">
