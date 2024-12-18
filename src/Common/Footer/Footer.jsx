@@ -267,7 +267,7 @@ const Footer = () => {
                     style={{ cursor: "pointer" }}
                     className="p-2 footer_last_social_item"
                   >
-                    <a href="revenuerocket2@gmail.com">
+                    <a href="revenuerocket2@gmail.com" target="_blank">
                       <img width="25" height="25" src={emailIcon} alt="email" />
                     </a>
                   </span>

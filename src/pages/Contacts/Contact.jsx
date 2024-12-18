@@ -125,11 +125,17 @@ const Contact = () => {
               <div className="contact_page_left_side_details">
                 <div className="shadow-sm p-4 border my-1 rounded">
                   <img
-                    title="phone-connected with lenexit"
+                    style={{
+                      opacity: "0.9",
+                      padding: "3px",
+                      borderRadius: "10px",
+                      backgroundColor: "white",
+                    }}
+                    title="phone-connected with Revenue Rocket"
                     width="30"
                     height="30"
                     src="https://img.icons8.com/ios-filled/000000/phone-disconnected.png"
-                    alt="phone-connected with lenexit"
+                    alt="phone-connected with Revenue Rocket"
                   />
                   <span
                     style={{ fontSize: "18px" }}
@@ -143,6 +149,12 @@ const Contact = () => {
                 </div>
                 <div className="shadow-sm p-4 border my-1 rounded">
                   <img
+                    style={{
+                      opacity: "0.9",
+                      padding: "3px",
+                      borderRadius: "10px",
+                      backgroundColor: "white",
+                    }}
                     title="mail-connected with lenexit"
                     width="25"
                     height="25"
@@ -156,11 +168,17 @@ const Contact = () => {
                     E-mail:{" "}
                   </span>
                   <span className="ml-2" style={{ fontSize: "16px" }}>
-                    mfaisal0125470@gmail.com.com
+                    revenuerocket2@gmail.com
                   </span>
                 </div>
                 <div className="shadow-sm p-4 border my-1 rounded">
                   <img
+                    style={{
+                      opacity: "0.9",
+                      padding: "3px",
+                      borderRadius: "10px",
+                      backgroundColor: "white",
+                    }}
                     title="address-connect with Revenue Rocket"
                     width="30"
                     height="30"
@@ -174,7 +192,7 @@ const Contact = () => {
                     office:{" "}
                   </span>
                   <span className="ml-2" style={{ fontSize: "16px" }}>
-                    Peoples Colony, Gujranwala
+                    Pakistan
                   </span>
                 </div>
               </div>
@@ -186,7 +204,7 @@ const Contact = () => {
                     style={{
                       fontWeight: "bold",
                       fontSize: "1.7rem",
-                      color: "#ed8854",
+                      color: "#000000",
                     }}
                   >
                     Let's Start Growing Your Business Today

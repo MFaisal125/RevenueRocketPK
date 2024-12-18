@@ -1,7 +1,9 @@
 #contact-page {
   padding: 60px;
 }
-
+.card {
+  background-color: aqua;
+}
 input.valid {
   border-color: #ed8854 !important;
 }
