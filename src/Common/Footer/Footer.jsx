@@ -233,7 +233,9 @@ const Footer = () => {
                     title="Revenue Rocket linkedin"
                     style={{ cursor: "pointer" }}
                     className="p-2 footer_last_social_item"
-                    onClick={() => LinkedInWindow("https://www.linkedin.com")}
+                    onClick={() =>
+                      LinkedInWindow("https://www.linkedin.com/in/mabdullah93/")
+                    }
                   >
                     <img
                       width="30"
@@ -246,7 +248,11 @@ const Footer = () => {
                     title="Revenue Rocket instagram"
                     style={{ cursor: "pointer" }}
                     className="p-2 footer_last_social_item"
-                    onClick={() => InstagramWindow("https://www.instagram.com")}
+                    onClick={() =>
+                      InstagramWindow(
+                        "https://www.instagram.com/revenuerocket2/"
+                      )
+                    }
                   >
                     <img
                       width="30"
@@ -261,7 +267,7 @@ const Footer = () => {
                     style={{ cursor: "pointer" }}
                     className="p-2 footer_last_social_item"
                   >
-                    <a href="mfaisal0125470@gmail.com">
+                    <a href="revenuerocket2@gmail.com">
                       <img width="25" height="25" src={emailIcon} alt="email" />
                     </a>
                   </span>
@@ -269,7 +275,11 @@ const Footer = () => {
                     title="Revenue Rocket fiverr"
                     style={{ cursor: "pointer" }}
                     className="p-2 footer_last_social_item"
-                    onClick={() => FiverrWindow("https://www.fiverr.com")}
+                    onClick={() =>
+                      FiverrWindow(
+                        " https://www.fiverr.com/mabdullah4567?up_rollout=true"
+                      )
+                    }
                   >
                     <img width="30" height="30" src={fiverrIcon} alt="fiverr" />
                   </span>
@@ -277,7 +287,11 @@ const Footer = () => {
                     title="Revenue Rocket upwork"
                     style={{ cursor: "pointer" }}
                     className="p-2 footer_last_social_item"
-                    onClick={() => UpworkWindow("https://www.upwork.com")}
+                    onClick={() =>
+                      UpworkWindow(
+                        "https://www.upwork.com/freelancers/~01f36034d354d78835?mp_source=share"
+                      )
+                    }
                   >
                     <img width="30" height="30" src={upworkIcon} alt="upwork" />
                   </span>
@@ -342,31 +356,31 @@ const Footer = () => {
               <div>
                 <b>Acceptance of Terms</b>
                 <p>
-                  By accessing and using Lenexit's services, including but not
-                  limited to website development, mobile app development, and
-                  digital marketing, you agree to be bound by these terms and
-                  conditions. If you do not agree to these terms, please refrain
-                  from using our services.
+                  By accessing and using Revenue Rocket services, including but
+                  not limited to website development, mobile app development,
+                  and digital marketing, you agree to be bound by these terms
+                  and conditions. If you do not agree to these terms, please
+                  refrain from using our services.
                 </p>
               </div>
               <div>
                 <b>Services</b>
                 <p>
-                  Lenexit provides web and mobile application development,
-                  digital marketing, and related services. The specifics of the
-                  services provided, including deliverables, timelines, and
-                  pricing, will be outlined in a separate agreement or project
-                  proposal.
+                  Revenue Rocket provides web and mobile application
+                  development, digital marketing, and related services. The
+                  specifics of the services provided, including deliverables,
+                  timelines, and pricing, will be outlined in a separate
+                  agreement or project proposal.
                 </p>
               </div>
               <div>
                 <b>Intellectual Property</b>
                 <p>
                   All intellectual property rights, including trademarks,
-                  copyrights, and patents, related to Lenexit's services and
-                  deliverables remain the property of Lenexit unless otherwise
-                  stated in a separate agreement. Unauthorized use,
-                  reproduction, or distribution of Lenexit's intellectual
+                  copyrights, and patents, related to Revenue Rocket services
+                  and deliverables remain the property of Revenue Rocket unless
+                  otherwise stated in a separate agreement. Unauthorized use,
+                  reproduction, or distribution of Revenue Rocket intellectual
                   property is strictly prohibited.
                 </p>
               </div>
@@ -375,7 +389,7 @@ const Footer = () => {
                 <p>
                   Clients are responsible for providing accurate and complete
                   information, materials, and necessary access required for the
-                  provision of services by Lenexit. Clients also bear
+                  provision of services by Revenue Rockets. Clients also bear
                   responsibility for ensuring that any content provided does not
                   infringe upon any third-party rights.
                 </p>
@@ -383,17 +397,17 @@ const Footer = () => {
               <div>
                 <b>Payment and Fees</b>
                 <p>
-                  Payment terms and fees for Lenexit's services will be outlined
-                  in a separate agreement or project proposal. Clients agree to
-                  make timely payments according to the agreed-upon terms.
-                  Failure to make payments may result in project delays or
-                  termination of services.
+                  Payment terms and fees for Revenue Rocket services will be
+                  outlined in a separate agreement or project proposal. Clients
+                  agree to make timely payments according to the agreed-upon
+                  terms. Failure to make payments may result in project delays
+                  or termination of services.
                 </p>
               </div>
               <div>
                 <b>Confidentiality</b>
                 <p>
-                  Lenexit and clients agree to treat any confidential
+                  Revenue Rocket and clients agree to treat any confidential
                   information shared during the course of the project as
                   strictly confidential. Both parties shall take appropriate
                   measures to maintain the confidentiality and protect sensitive
@@ -403,11 +417,11 @@ const Footer = () => {
               <div>
                 <b>Limitation of Liability</b>
                 <p>
-                  Lenexit shall not be held liable for any direct, indirect,
-                  incidental, or consequential damages arising from the use or
-                  inability to use our services. We make no guarantees or
-                  warranties regarding the performance, accuracy, or suitability
-                  of the services provided.
+                  Revenue Rocket shall not be held liable for any direct,
+                  indirect, incidental, or consequential damages arising from
+                  the use or inability to use our services. We make no
+                  guarantees or warranties regarding the performance, accuracy,
+                  or suitability of the services provided.
                 </p>
               </div>
               <div>
@@ -432,15 +446,15 @@ const Footer = () => {
               <div>
                 <b>Amendments</b>
                 <p>
-                  Lenexit reserves the right to modify or update these terms and
-                  conditions at any time. Clients will be notified of any
-                  changes, and continued use of our services after the
+                  Revenue Rocket reserves the right to modify or update these
+                  terms and conditions at any time. Clients will be notified of
+                  any changes, and continued use of our services after the
                   notification constitutes acceptance of the modified terms.
                   These terms and conditions constitute the entire agreement
-                  between Lenexit and its clients and supersede any prior
+                  between Revenue Rocket and its clients and supersede any prior
                   agreements or understandings. If you have any questions or
                   concerns about these terms and conditions, please contact
-                  Lenexit for clarification.
+                  Revenue Rocket for clarification.
                 </p>
               </div>
             </div>
@@ -457,7 +471,7 @@ const Footer = () => {
       <>
         <Modal show={CookieShow} onHide={cookieeClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Cookie Policy of Lenexit</Modal.Title>
+            <Modal.Title>Cookie Policy of Revenue Rocket</Modal.Title>
             {/* <Button variant='secondary' onClick={cookieeClose}><span aria-hidden="true">&times;</span></Button> */}
           </Modal.Header>
           <Modal.Body>
@@ -649,18 +663,18 @@ const Footer = () => {
               <Accordion defaultActiveKey="0" flush>
                 <Accordion.Item eventKey="0">
                   <Accordion.Header className="accordion-header">
-                    What services does Lenexit provide?
+                    What services does Revenue Rocket provide?
                   </Accordion.Header>
                   <Accordion.Body className="accordion_body">
-                    Lenexit offers a range of services including web and mobile
-                    app development, custom plugin and theme development, SEO,
-                    UI/UX design, penetration testing, and more. We provide
+                    Revenue Rocket offers a range of services including web and
+                    mobile app development, custom plugin and theme development,
+                    SEO, UI/UX design, penetration testing, and more. We provide
                     comprehensive solutions to meet your business needs.
                   </Accordion.Body>
                 </Accordion.Item>
                 <Accordion.Item eventKey="1">
                   <Accordion.Header className="accordion-header">
-                    How experienced is the team at Lenexit?
+                    How experienced is the team at Revenue Rocket?
                   </Accordion.Header>
                   <Accordion.Body className="accordion_body">
                     Our team consists of highly skilled professionals with years
@@ -723,12 +737,12 @@ const Footer = () => {
                     How do you ensure the security of my project?
                   </Accordion.Header>
                   <Accordion.Body className="accordion_body">
-                    At Lenexit, we prioritize the security of our clients'
-                    projects. We follow industry best practices and implement
-                    robust security measures to protect your data and ensure a
-                    secure development environment. We conduct regular security
-                    audits and follow strict protocols to safeguard your
-                    project.
+                    At Revenue Rocket, we prioritize the security of our
+                    clients' projects. We follow industry best practices and
+                    implement robust security measures to protect your data and
+                    ensure a secure development environment. We conduct regular
+                    security audits and follow strict protocols to safeguard
+                    your project.
                   </Accordion.Body>
                 </Accordion.Item>
                 <Accordion.Item eventKey="7">
@@ -757,15 +771,15 @@ const Footer = () => {
                 </Accordion.Item>
                 <Accordion.Item eventKey="9">
                   <Accordion.Header className="accordion-header">
-                    What is the process to start a project with Lenexit?
+                    What is the process to start a project with Revenue Rocket?
                   </Accordion.Header>
                   <Accordion.Body className="accordion_body">
-                    To start a project with Lenexit, simply reach out to us with
-                    your requirements. We'll schedule an initial consultation to
-                    discuss your project in detail. From there, we'll provide
-                    you with a proposal outlining the project scope, timeline,
-                    and cost. Once you approve the proposal, we'll initiate the
-                    project development process.
+                    To start a project with Revenue Rocket, simply reach out to
+                    us with your requirements. We'll schedule an initial
+                    consultation to discuss your project in detail. From there,
+                    we'll provide you with a proposal outlining the project
+                    scope, timeline, and cost. Once you approve the proposal,
+                    we'll initiate the project development process.
                   </Accordion.Body>
                 </Accordion.Item>
               </Accordion>
