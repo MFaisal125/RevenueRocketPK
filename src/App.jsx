@@ -15,7 +15,7 @@ function App() {
   var count = 0;
   function user_visitor() {
     count++;
-    fetch("https://api.lenexit.com/api/visitor", {
+    fetch("https://www.revenuerocket.site/api/visitor", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

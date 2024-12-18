@@ -27,7 +27,7 @@ const Blogs = () => {
   let [Data, setData] = useState([]);
   useEffect(() => {
     let xhr = new XMLHttpRequest();
-    let url = "https://api.lenexit.com/api/post/";
+    let url = "https://www.revenuerocket.site/api/post/";
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status === 200) {
