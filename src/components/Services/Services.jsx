@@ -279,8 +279,22 @@
 
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
-// import Carousel from "react-multi-carousel" // Removed
-// import "react-multi-carousel/lib/styles.css" // Removed
+import {
+  motion,
+  useAnimation,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Maximize,
+  Minimize,
+  Plus,
+  Zap,
+} from "lucide-react";
 
 // Import icons (assuming these paths are correct)
 import codeIcon from "../../assets/image/code.png";
@@ -296,40 +310,34 @@ import cmsIcon from "../../assets/image/cms.png";
 const Services = () => {
   // State for animations and interactions
   const [isVisible, setIsVisible] = useState(false);
-  const [activeCard, setActiveCard] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [expandedCard, setExpandedCard] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [scrollProgress, setScrollProgress] = useState(0);
-  // Remove the state for carousel position since we're handling it differently now
-  // Change this line:
-  // To:
-  // We don't need this state anymore since we're handling scrolling with animation frames
+  const [scrollDirection, setScrollDirection] = useState(1); // 1 for right, -1 for left
+  const [scrollSpeed, setScrollSpeed] = useState(0.5);
+  const [hoverCardIndex, setHoverCardIndex] = useState(null);
 
   // Refs
   const sectionRef = useRef(null);
-  const canvasRef = useRef(null);
+  const carouselRef = useRef(null);
   const cardsRef = useRef([]);
+  const canvasRef = useRef(null);
+  const trackRef = useRef(null);
+  const animationRef = useRef(null);
 
-  // Responsive carousel settings
-  // Remove the unnecessary responsive carousel settings since we're not using react-multi-carousel
-  // Delete this block:
-  // const responsive = {
-  //   superLargeDesktop: {
-  //     breakpoint: { max: 4000, min: 3000 },
-  //     items: 5,
-  //   },
-  //   desktop: {
-  //     breakpoint: { max: 3000, min: 1024 },
-  //     items: 3,
-  //   },
-  //   tablet: {
-  //     breakpoint: { max: 1024, min: 464 },
-  //     items: 2,
-  //   },
-  //   mobile: {
-  //     breakpoint: { max: 464, min: 0 },
-  //     items: 1,
-  //   },
-  // };
+  // Motion values for parallax effects
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-100, 100], [30, -30]);
+  const rotateY = useTransform(x, [-100, 100], [-30, 30]);
+
+  // Controls for animations
+  const controls = useAnimation();
 
   // Service data
   const services = [
@@ -340,6 +348,12 @@ const Services = () => {
         "Revenue Rocket offers full-stack web development services, delivering end-to-end solutions that encompass front-end and back-end expertise for seamless digital experiences.",
       color: "#05d9e8",
       altText: "full-stack web development services",
+      features: [
+        "Responsive Design",
+        "API Integration",
+        "Database Management",
+        "Performance Optimization",
+      ],
     },
     {
       icon: monitorIcon,
@@ -348,6 +362,12 @@ const Services = () => {
         "Revenue Rocket specializes in desktop app development, delivering comprehensive solutions that encompass both front-end and back-end expertise for optimal user experiences.",
       color: "#ff2a6d",
       altText: "desktop app development",
+      features: [
+        "Cross-platform Support",
+        "Native Integration",
+        "Custom UI/UX",
+        "Offline Functionality",
+      ],
     },
     {
       icon: mobileappIcon,
@@ -356,6 +376,12 @@ const Services = () => {
         "Revenue Rocket excels in Android and iOS mobile app development, delivering intuitive and engaging applications that captivate users and drive business growth.",
       color: "#d100d1",
       altText: "Android and iOS mobile app development",
+      features: [
+        "Native Development",
+        "Cross-platform Solutions",
+        "App Store Optimization",
+        "Push Notifications",
+      ],
     },
     {
       icon: windowbugIcon,
@@ -364,6 +390,12 @@ const Services = () => {
         "Revenue Rocket offers professional penetration testing services to identify and address vulnerabilities, ensuring the security and resilience of your digital assets.",
       color: "#f9c80e",
       altText: "penetration testing services",
+      features: [
+        "Vulnerability Assessment",
+        "Security Audits",
+        "Compliance Testing",
+        "Remediation Support",
+      ],
     },
     {
       icon: designIcon,
@@ -372,6 +404,12 @@ const Services = () => {
         "Revenue Rocket provides captivating graphics design services that enhance brand identity and create visually appealing designs for a lasting impression.",
       color: "#7b00ff",
       altText: "graphics design services",
+      features: [
+        "Brand Identity",
+        "Print Design",
+        "Digital Assets",
+        "Motion Graphics",
+      ],
     },
     {
       icon: seoIcon,
@@ -380,6 +418,12 @@ const Services = () => {
         "Revenue Rocket offers effective SEO services to boost online visibility, increase organic traffic, and improve search engine rankings for long-term success.",
       color: "#00ff9f",
       altText: "SEO services",
+      features: [
+        "Keyword Research",
+        "On-page Optimization",
+        "Link Building",
+        "Analytics & Reporting",
+      ],
     },
     {
       icon: pluginIcon,
@@ -388,6 +432,12 @@ const Services = () => {
         "Revenue Rocket specializes in custom plugin development, creating tailored solutions that seamlessly integrate with your existing systems and enhance the functionality of your website or application.",
       color: "#ee834d",
       altText: "custom plugin development",
+      features: [
+        "Custom Themes",
+        "App Development",
+        "Store Optimization",
+        "Payment Integration",
+      ],
     },
     {
       icon: wordpressIcon,
@@ -396,6 +446,12 @@ const Services = () => {
         "Revenue Rocket excels in custom WordPress theme development, crafting unique and visually captivating designs that align with your brand and provide a seamless user experience.",
       color: "#01c5c4",
       altText: "custom WordPress theme development",
+      features: [
+        "Responsive Themes",
+        "Custom Plugins",
+        "WooCommerce Integration",
+        "Performance Optimization",
+      ],
     },
     {
       icon: cmsIcon,
@@ -404,8 +460,28 @@ const Services = () => {
         "Revenue Rocket specializes in ecommerce website development, creating robust and user-friendly online stores that drive sales and provide a seamless shopping experience for customers.",
       color: "#b967ff",
       altText: "ecommerce website development",
+      features: [
+        "Product Management",
+        "Payment Gateways",
+        "Inventory Systems",
+        "Customer Analytics",
+      ],
     },
   ];
+
+  // Duplicate services for infinite scrolling
+  const extendedServices = [...services, ...services, ...services];
+
+  // Determine if mobile based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Track mouse position for interactive effects
   useEffect(() => {
@@ -427,12 +503,10 @@ const Services = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.disconnect();
-          }
-        });
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
       },
       { threshold: 0.2 }
     );
@@ -442,28 +516,6 @@ const Services = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
-
-  // Scroll progress effect
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-
-      const rect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      // Calculate how much of the section is visible
-      const visibleHeight =
-        Math.min(windowHeight, rect.bottom) - Math.max(0, rect.top);
-      const progress = Math.max(0, Math.min(1, visibleHeight / rect.height));
-
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial calculation
-
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Quantum particle background effect
@@ -484,44 +536,141 @@ const Services = () => {
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    // Reduced particle count for better performance
+    // Create particles with more variety
     const particles = [];
-    const particleCount = 30; // Further reduced
+    const particleCount = 60;
 
     for (let i = 0; i < particleCount; i++) {
+      const size = Math.random() * 2 + 0.5;
+      const type = Math.floor(Math.random() * 3); // 0: circle, 1: square, 2: triangle
+
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        radius: Math.random() * 1.5 + 0.5,
-        baseColor:
-          Math.random() > 0.5
-            ? `hsl(${Math.random() * 60 + 20}, 100%, 70%)`
-            : `hsl(${Math.random() * 60 + 180}, 100%, 70%)`,
-        speedX: Math.random() * 0.2 - 0.1, // Even slower movement
-        speedY: Math.random() * 0.2 - 0.1,
-        opacity: Math.random() * 0.3 + 0.1,
+        size: size,
+        type: type,
+        color:
+          i % 5 === 0
+            ? `rgba(5, 217, 232, ${Math.random() * 0.5 + 0.1})`
+            : i % 5 === 1
+            ? `rgba(238, 131, 77, ${Math.random() * 0.5 + 0.1})`
+            : i % 5 === 2
+            ? `rgba(209, 0, 209, ${Math.random() * 0.5 + 0.1})`
+            : i % 5 === 3
+            ? `rgba(249, 200, 14, ${Math.random() * 0.5 + 0.1})`
+            : `rgba(0, 255, 159, ${Math.random() * 0.5 + 0.1})`,
+        speedX: (Math.random() - 0.5) * 0.3,
+        speedY: (Math.random() - 0.5) * 0.3,
+        opacity: Math.random() * 0.5 + 0.1,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 0.5,
+        pulse: Math.random() * 0.5 + 0.5,
+        pulseSpeed: Math.random() * 0.02 + 0.01,
       });
     }
 
-    const drawParticles = () => {
+    const drawParticles = (time) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      particles.forEach((particle) => {
-        // Simplified particle rendering
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particle.baseColor.replace(
-          ")",
-          `, ${particle.opacity})`
-        );
-        ctx.fill();
-
-        // Update position with boundary check
+      // Draw particles
+      particles.forEach((particle, index) => {
+        // Update position
         particle.x += particle.speedX;
         particle.y += particle.speedY;
 
-        if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
-        if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
+        // Boundary check with wrap-around
+        if (particle.x < -50) particle.x = canvas.width + 50;
+        if (particle.x > canvas.width + 50) particle.x = -50;
+        if (particle.y < -50) particle.y = canvas.height + 50;
+        if (particle.y > canvas.height + 50) particle.y = -50;
+
+        // Update rotation
+        particle.rotation += particle.rotationSpeed;
+
+        // Pulse effect
+        particle.pulse = 0.5 + Math.sin(time * particle.pulseSpeed) * 0.5;
+
+        // Save context
+        ctx.save();
+
+        // Translate to particle position
+        ctx.translate(particle.x, particle.y);
+
+        // Rotate
+        ctx.rotate((particle.rotation * Math.PI) / 180);
+
+        // Set fill style with pulse effect
+        ctx.fillStyle = particle.color.replace(
+          ")",
+          `, ${particle.opacity * particle.pulse})`
+        );
+
+        // Draw based on type
+        if (particle.type === 0) {
+          // Circle
+          ctx.beginPath();
+          ctx.arc(0, 0, particle.size, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (particle.type === 1) {
+          // Square
+          ctx.fillRect(
+            -particle.size,
+            -particle.size,
+            particle.size * 2,
+            particle.size * 2
+          );
+        } else {
+          // Triangle
+          ctx.beginPath();
+          ctx.moveTo(0, -particle.size);
+          ctx.lineTo(particle.size, particle.size);
+          ctx.lineTo(-particle.size, particle.size);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Restore context
+        ctx.restore();
+
+        // Draw connections to nearby particles
+        for (let j = index + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = particle.x - p2.x;
+          const dy = particle.y - p2.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(p2.x, p2.y);
+
+            // Gradient line
+            const gradient = ctx.createLinearGradient(
+              particle.x,
+              particle.y,
+              p2.x,
+              p2.y
+            );
+            gradient.addColorStop(
+              0,
+              particle.color.replace(
+                ")",
+                `, ${0.2 * (1 - distance / 100) * particle.pulse})`
+              )
+            );
+            gradient.addColorStop(
+              1,
+              p2.color.replace(
+                ")",
+                `, ${0.2 * (1 - distance / 100) * p2.pulse})`
+              )
+            );
+
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 0.5 * (1 - distance / 100);
+            ctx.stroke();
+          }
+        }
       });
 
       animationFrameId = requestAnimationFrame(drawParticles);
@@ -535,83 +684,242 @@ const Services = () => {
     };
   }, [isVisible]);
 
+  // Infinite smooth scrolling carousel
+  useEffect(() => {
+    if (!trackRef.current || !isVisible) return;
+
+    const track = trackRef.current;
+    const cards = track.querySelectorAll(".hyper-service-card");
+    const cardWidth = cards[0].offsetWidth + 20; // Card width + gap
+    const totalWidth = cardWidth * cards.length;
+
+    // Set initial position
+    let currentPosition = 0;
+    let lastTimestamp = 0;
+
+    const animate = (timestamp) => {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const elapsed = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
+
+      // Only scroll if not hovering or dragging
+      if (!isHovering && !isDragging) {
+        // Update position based on direction and speed
+        currentPosition += scrollDirection * scrollSpeed * (elapsed / 16);
+
+        // Loop back when reaching the end
+        if (currentPosition > totalWidth / 3) {
+          currentPosition = 0;
+        } else if (currentPosition < 0) {
+          currentPosition = totalWidth / 3 - cardWidth;
+        }
+
+        // Apply the transform
+        track.style.transform = `translateX(-${currentPosition}px)`;
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isVisible, isHovering, isDragging, scrollDirection, scrollSpeed]);
+
+  // Handle mouse down for dragging
+  const handleMouseDown = (e) => {
+    if (!trackRef.current) return;
+
+    setIsDragging(true);
+    setStartX(e.pageX - trackRef.current.offsetLeft);
+    setScrollLeft(trackRef.current.scrollLeft);
+  };
+
+  // Handle mouse leave
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+    setIsHovering(false);
+  };
+
+  // Handle mouse up
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Handle mouse move for dragging
+  const handleMouseMove = (e) => {
+    if (!isDragging || !trackRef.current) return;
+
+    const x = e.pageX - trackRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed multiplier
+
+    // Update scroll position
+    trackRef.current.scrollLeft = scrollLeft - walk;
+  };
+
   // Handle card hover
   const handleCardHover = (index) => {
-    setActiveCard(index);
+    setHoverCardIndex(index);
+    setIsHovering(true);
+
+    // Slow down scrolling when hovering
+    setScrollSpeed(0.1);
   };
 
   // Handle card leave
   const handleCardLeave = () => {
-    setActiveCard(null);
+    setHoverCardIndex(null);
+    setIsHovering(false);
+
+    // Reset scroll speed
+    setScrollSpeed(0.5);
   };
 
-  // Auto-scrolling carousel effect
+  // Handle card expansion
+  const handleCardExpand = (index, e) => {
+    e.stopPropagation();
+    setExpandedCard(expandedCard === index ? null : index);
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
+  const expandedCardVariants = {
+    collapsed: {
+      height: "350px",
+      width: "100%",
+      zIndex: 1,
+    },
+    expanded: {
+      height: "450px",
+      width: "110%",
+      zIndex: 10,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  // Update the useEffect for infinite smooth scrolling to make it truly infinite without resetting
+  // Replace the existing infinite scrolling useEffect with this improved version:
+
   useEffect(() => {
-    const track = document.querySelector(".hyper-carousel-track");
-    if (!track) return;
+    if (!trackRef.current || !isVisible) return;
 
-    // Calculate the total width of all cards
-    const totalWidth = track.scrollWidth;
-    const viewportWidth = track.parentElement.clientWidth;
-    const maxScroll = totalWidth - viewportWidth;
+    const track = trackRef.current;
+    const cards = track.querySelectorAll(".hyper-service-card");
+    const cardWidth = cards[0].offsetWidth + 20; // Card width + gap
+    const totalWidth = cardWidth * services.length; // Width of one set of services
 
-    let scrollPosition = 0;
-    let scrollDirection = 1; // 1 for right, -1 for left
-    const scrollSpeed = 0.5; // pixels per frame
-    let isPaused = false;
-    let animationFrameId;
+    // Set initial position
+    let currentPosition = 0;
+    let lastTimestamp = 0;
 
-    const scroll = () => {
-      if (!isPaused) {
-        scrollPosition += scrollDirection * scrollSpeed;
+    const animate = (timestamp) => {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const elapsed = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
 
-        // Reverse direction when reaching the end
-        if (scrollPosition >= maxScroll) {
-          scrollDirection = -1;
-        } else if (scrollPosition <= 0) {
-          scrollDirection = 1;
+      // Only scroll if not hovering or dragging
+      if (!isHovering && !isDragging) {
+        // Update position based on direction and speed
+        currentPosition += scrollDirection * scrollSpeed * (elapsed / 16);
+
+        // Create infinite loop effect
+        if (currentPosition >= totalWidth) {
+          // If we've scrolled past the first set, jump back to start position
+          currentPosition = 0;
+        } else if (currentPosition < 0) {
+          // If we've scrolled backwards past the start, jump to end of first set
+          currentPosition = totalWidth - cardWidth;
         }
 
-        track.style.transform = `translateX(-${scrollPosition}px)`;
+        // Apply the transform
+        track.style.transform = `translateX(-${currentPosition}px)`;
       }
-      animationFrameId = requestAnimationFrame(scroll);
+
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    // Start the animation
-    animationFrameId = requestAnimationFrame(scroll);
-
-    // Pause scrolling when hovering over the carousel
-    const handleMouseEnter = () => {
-      isPaused = true;
-    };
-
-    const handleMouseLeave = () => {
-      isPaused = false;
-    };
-
-    track.parentElement.addEventListener("mouseenter", handleMouseEnter);
-    track.parentElement.addEventListener("mouseleave", handleMouseLeave);
-
-    // Handle touch events for mobile
-    track.parentElement.addEventListener("touchstart", handleMouseEnter);
-    track.parentElement.addEventListener("touchend", handleMouseLeave);
+    animationRef.current = requestAnimationFrame(animate);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      track.parentElement.removeEventListener("mouseenter", handleMouseEnter);
-      track.parentElement.removeEventListener("mouseleave", handleMouseLeave);
-      track.parentElement.removeEventListener("touchstart", handleMouseEnter);
-      track.parentElement.removeEventListener("touchend", handleMouseLeave);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
-  }, []);
+  }, [
+    isVisible,
+    isHovering,
+    isDragging,
+    scrollDirection,
+    scrollSpeed,
+    services.length,
+  ]);
+
+  // Add touch event handlers for mobile
+  // Add these new functions after the existing event handlers:
+
+  // Handle touch start for mobile
+  const handleTouchStart = (e) => {
+    if (!trackRef.current) return;
+
+    setIsDragging(true);
+    setStartX(e.touches[0].pageX - trackRef.current.offsetLeft);
+    setScrollLeft(trackRef.current.scrollLeft);
+  };
+
+  // Handle touch move for mobile
+  const handleTouchMove = (e) => {
+    if (!isDragging || !trackRef.current) return;
+
+    const x = e.touches[0].pageX - trackRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed multiplier
+
+    // Update scroll position
+    trackRef.current.scrollLeft = scrollLeft - walk;
+
+    // Prevent page scrolling while dragging the carousel
+    e.preventDefault();
+  };
+
+  // Handle touch end for mobile
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
 
   return (
     <section
       id="services"
       ref={sectionRef}
-      className={`quantum-services-section ${isVisible ? "visible" : ""}`}
+      className={`hyper-services-section ${isVisible ? "visible" : ""}`}
       style={{
-        "--scroll-progress": scrollProgress,
+        "--mouse-x": mousePosition.x,
+        "--mouse-y": mousePosition.y,
       }}
     >
       {/* Quantum particle background */}
@@ -620,49 +928,92 @@ const Services = () => {
       {/* Holographic overlay */}
       <div className="holographic-overlay"></div>
 
-      {/* Scanning line effect */}
-      <div className="scanning-line"></div>
+      {/* Scanning lines */}
       <div className="scanning-line horizontal"></div>
+      <div className="scanning-line vertical"></div>
+      <div className="scanning-grid"></div>
 
-      <div className="quantum-container">
-        <div className="quantum-title-container">
-          <div className="quantum-badge-wrapper">
-            <div className="quantum-badge">
-              <span className="quantum-badge-text">OUR HIGH SERVICES</span>
-              <div className="quantum-badge-glow"></div>
+      <div className="hyper-container">
+        <motion.div
+          className="hyper-title-container"
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
+          <motion.div className="hyper-badge-wrapper" variants={cardVariants}>
+            <div className="hyper-badge">
+              <span className="hyper-badge-text">OUR HIGH SERVICES</span>
+              <div className="hyper-badge-glow"></div>
+              <Zap className="hyper-badge-icon" size={14} />
             </div>
-          </div>
+          </motion.div>
 
-          <h2 className="quantum-title">
+          <motion.h2 className="hyper-title" variants={cardVariants}>
             OUR PREMIUM SERVICES{" "}
-            <span className="quantum-highlight">REVENUE ROCKET</span>
-          </h2>
+            <span className="hyper-highlight">REVENUE ROCKET</span>
+          </motion.h2>
 
-          <div className="quantum-title-underline"></div>
-        </div>
+          <motion.div
+            className="hyper-title-underline"
+            variants={cardVariants}
+          ></motion.div>
 
-        <div className="quantum-service-container">
-          {/* Optimized Carousel - Replaced react-multi-carousel with custom implementation */}
-          <div className="hyper-carousel">
-            <div className="hyper-carousel-track">
-              {services.map((service, index) => (
-                <div
-                  key={index}
-                  ref={(el) => (cardsRef.current[index] = el)}
+          <motion.p className="hyper-subtitle" variants={cardVariants}>
+            Discover our cutting-edge solutions designed to elevate your digital
+            presence
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          className="hyper-carousel-container"
+          initial={{ opacity: 0 }}
+          animate={isVisible ? { opacity: 1 } : {}}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={handleMouseLeave}
+          ref={carouselRef}
+        >
+          <div className="hyper-carousel-track-container">
+            <div
+              className="hyper-carousel-track"
+              ref={trackRef}
+              onMouseDown={handleMouseDown}
+              onMouseLeave={handleMouseLeave}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {extendedServices.map((service, index) => (
+                <motion.div
+                  key={`card-${index}`}
                   className={`hyper-service-card ${
-                    activeCard === index ? "active" : ""
-                  }`}
-                  onMouseEnter={() => handleCardHover(index)}
-                  onMouseLeave={handleCardLeave}
+                    expandedCard === index ? "expanded" : ""
+                  } ${hoverCardIndex === index ? "hovered" : ""}`}
                   style={{
                     "--card-color": service.color,
-                    "--card-index": index,
+                    "--card-index": index % services.length,
+                  }}
+                  ref={(el) => (cardsRef.current[index] = el)}
+                  onMouseEnter={() => handleCardHover(index)}
+                  onMouseLeave={handleCardLeave}
+                  variants={expandedCardVariants}
+                  animate={expandedCard === index ? "expanded" : "collapsed"}
+                  whileHover={{
+                    y: expandedCard === index ? 0 : -10,
+                    transition: { duration: 0.3 },
                   }}
                 >
-                  {/* Optimized card content with reduced DOM elements */}
                   <div className="hyper-card-content">
                     <div className="hyper-card-header">
-                      <div className="hyper-icon-container">
+                      <motion.div
+                        className="hyper-icon-container"
+                        whileHover={{
+                          scale: 1.1,
+                          boxShadow: `0 0 20px ${service.color}80`,
+                        }}
+                      >
                         <img
                           className="hyper-icon"
                           width="50"
@@ -673,140 +1024,226 @@ const Services = () => {
                           loading="lazy"
                         />
                         <div className="hyper-icon-glow"></div>
-                      </div>
+                      </motion.div>
 
-                      <h3 className="hyper-card-title">{service.title}</h3>
+                      <div className="hyper-card-title-container">
+                        <h3 className="hyper-card-title">{service.title}</h3>
+                        <button
+                          className="hyper-expand-button"
+                          onClick={(e) => handleCardExpand(index, e)}
+                          aria-label={
+                            expandedCard === index
+                              ? "Collapse card"
+                              : "Expand card"
+                          }
+                        >
+                          {expandedCard === index ? (
+                            <Minimize size={16} />
+                          ) : (
+                            <Maximize size={16} />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="hyper-card-body">
                       <p className="hyper-card-description">
                         {service.description}
                       </p>
+
+                      {expandedCard === index && (
+                        <motion.div
+                          className="hyper-card-features"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <h4 className="hyper-features-title">Key Features</h4>
+                          <ul className="hyper-features-list">
+                            {service.features.map((feature, i) => (
+                              <motion.li
+                                key={i}
+                                className="hyper-feature-item"
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.1 * i }}
+                              >
+                                <Plus
+                                  size={12}
+                                  className="hyper-feature-icon"
+                                />
+                                {feature}
+                              </motion.li>
+                            ))}
+                          </ul>
+                        </motion.div>
+                      )}
                     </div>
 
-                    {/* Simplified holographic elements */}
+                    <div className="hyper-card-footer">
+                      <motion.button
+                        className="hyper-card-button"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Learn More
+                        <ExternalLink size={14} className="hyper-button-icon" />
+                      </motion.button>
+                    </div>
+
+                    {/* Holographic elements */}
                     <div className="hyper-card-hologram">
                       <div className="hologram-corner top-left"></div>
                       <div className="hologram-corner top-right"></div>
                       <div className="hologram-corner bottom-left"></div>
                       <div className="hologram-corner bottom-right"></div>
+                      <div className="hologram-circle"></div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
+          </div>
 
-            {/* Custom navigation controls */}
-            <div className="hyper-carousel-controls">
-              <div className="hyper-carousel-dots">
-                {services.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`hyper-dot ${
-                      activeCard === index ? "active" : ""
-                    }`}
-                    onClick={() => handleCardHover(index)}
-                    aria-label={`View service ${index + 1}`}
-                  />
-                ))}
+          {/* Carousel controls */}
+          <div className="hyper-carousel-controls">
+            <motion.button
+              className="hyper-carousel-arrow prev"
+              onClick={() => setScrollDirection(-1)}
+              whileHover={{ scale: 1.1, x: -5 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ChevronLeft className="arrow-icon" />
+            </motion.button>
+
+            <div className="hyper-carousel-speed">
+              <div className="speed-label">Speed</div>
+              <div className="speed-control">
+                <button
+                  className={`speed-button ${
+                    scrollSpeed === 0.25 ? "active" : ""
+                  }`}
+                  onClick={() => setScrollSpeed(0.25)}
+                >
+                  1x
+                </button>
+                <button
+                  className={`speed-button ${
+                    scrollSpeed === 0.5 ? "active" : ""
+                  }`}
+                  onClick={() => setScrollSpeed(0.5)}
+                >
+                  2x
+                </button>
+                <button
+                  className={`speed-button ${
+                    scrollSpeed === 1 ? "active" : ""
+                  }`}
+                  onClick={() => setScrollSpeed(1)}
+                >
+                  3x
+                </button>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="quantum-cta-container">
-          <NavLink to="/service" className="quantum-button">
+            <motion.button
+              className="hyper-carousel-arrow next"
+              onClick={() => setScrollDirection(1)}
+              whileHover={{ scale: 1.1, x: 5 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ChevronRight className="arrow-icon" />
+            </motion.button>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="hyper-cta-container"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, delay: 0.9 }}
+        >
+          <NavLink to="/service" className="hyper-button">
             <div className="button-background"></div>
-            <span className="quantum-button-text">LEARN MORE</span>
-            <div className="quantum-button-glow"></div>
-            <div className="quantum-button-particles"></div>
-            <div className="quantum-button-icon">
-              <svg
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </div>
+            <motion.span
+              className="hyper-button-text"
+              initial={{ x: 0 }}
+              whileHover={{ x: -5 }}
+            >
+              EXPLORE ALL SERVICES
+            </motion.span>
+            <motion.div
+              className="hyper-button-icon"
+              initial={{ x: 0 }}
+              whileHover={{ x: 5 }}
+            >
+              <ArrowRight size={18} />
+            </motion.div>
+            <div className="hyper-button-glow"></div>
+            <div className="hyper-button-particles"></div>
           </NavLink>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Futuristic 4000 CSS Styles */}
       <style jsx>{`
         /* Base Variables */
         :root {
           --primary: #0a0e17;
+          --primary-dark: #050a14;
+          --primary-light: #1a2030;
           --secondary: #ee834d;
           --secondary-glow: rgba(238, 131, 77, 0.6);
           --tertiary: #05d9e8;
           --tertiary-glow: rgba(5, 217, 232, 0.6);
           --quaternary: #d100d1;
           --quaternary-glow: rgba(209, 0, 209, 0.6);
+          --accent-yellow: #f9c80e;
+          --accent-green: #00ff9f;
           --text: #ffffff;
           --text-secondary: rgba(255, 255, 255, 0.7);
           --glass-bg: rgba(10, 14, 23, 0.7);
           --glass-border: rgba(255, 255, 255, 0.1);
           --glass-highlight: rgba(255, 255, 255, 0.05);
-          --neon-glow: 0 0 10px var(--secondary-glow),
-            0 0 20px var(--secondary-glow);
           --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
           --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        /* Import futuristic font */
+        /* Import futuristic fonts */
         @import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap");
         @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap");
 
-        /* Quantum Services Section */
-        .quantum-services-section {
+        /* Hyper Services Section */
+        .hyper-services-section {
           position: relative;
           padding: 8rem 0;
           background: linear-gradient(135deg, #0a0e17 0%, #121a2c 100%);
+          color: var(--text);
           overflow: hidden;
+          font-family: "Rajdhani", sans-serif;
           opacity: 0;
           transform: translateY(30px);
           transition: opacity 1s ease, transform 1s ease;
-          font-family: "Rajdhani", sans-serif;
           min-height: 100vh;
         }
 
-        .quantum-services-section.visible {
+        .hyper-services-section.visible {
           opacity: 1;
           transform: translateY(0);
         }
 
-        .quantum-services-section::before {
+        .hyper-services-section::before {
           content: "";
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          background: radial-gradient(
-              circle at 20% 30%,
-              rgba(238, 131, 77, 0.05) 0%,
-              transparent 30%
-            ),
-            radial-gradient(
-              circle at 80% 70%,
-              rgba(5, 217, 232, 0.05) 0%,
-              transparent 30%
-            ),
-            radial-gradient(
-              circle at 50% 50%,
-              rgba(209, 0, 209, 0.03) 0%,
-              transparent 50%
-            );
+          background: radial-gradient(circle at 20% 30%, rgba(238, 131, 77, 0.05) 0%, transparent 30%),
+            radial-gradient(circle at 80% 70%, rgba(5, 217, 232, 0.05) 0131,77,0.05) 0%, transparent 30%),
+            radial-gradient(circle at 80% 70%, rgba(5, 217, 232, 0.05) 0%, transparent 30%),
+            radial-gradient(circle at 50% 50%, rgba(209, 0, 209, 0.03) 0%, transparent 50%);
           pointer-events: none;
         }
 
@@ -841,6 +1278,12 @@ const Services = () => {
         /* Scanning line effect */
         .scanning-line {
           position: absolute;
+          z-index: 1;
+          opacity: 0.5;
+          pointer-events: none;
+        }
+
+        .scanning-line.horizontal {
           top: 0;
           left: 0;
           width: 100%;
@@ -853,18 +1296,49 @@ const Services = () => {
           );
           box-shadow: 0 0 10px var(--tertiary-glow),
             0 0 20px var(--tertiary-glow);
-          z-index: 1;
-          animation: scanLine 8s linear infinite;
-          opacity: 0.7;
+          animation: scanLineHorizontal 8s linear infinite;
         }
 
-        .scanning-line.horizontal {
+        .scanning-line.vertical {
+          top: 0;
+          left: 0;
           width: 2px;
           height: 100%;
-          animation: scanLineHorizontal 12s linear infinite;
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0) 0%,
+            var(--secondary) 50%,
+            rgba(0, 0, 0, 0) 100%
+          );
+          box-shadow: 0 0 10px var(--secondary-glow),
+            0 0 20px var(--secondary-glow);
+          animation: scanLineVertical 12s linear infinite;
         }
 
-        @keyframes scanLine {
+        /* Scanning grid */
+        .scanning-grid {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: linear-gradient(
+              to right,
+              rgba(5, 217, 232, 0.05) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              to bottom,
+              rgba(5, 217, 232, 0.05) 1px,
+              transparent 1px
+            );
+          background-size: 50px 50px;
+          pointer-events: none;
+          z-index: 0;
+          opacity: 0.3;
+        }
+
+        @keyframes scanLineHorizontal {
           0% {
             top: 0%;
           }
@@ -873,7 +1347,7 @@ const Services = () => {
           }
         }
 
-        @keyframes scanLineHorizontal {
+        @keyframes scanLineVertical {
           0% {
             left: 0%;
           }
@@ -882,7 +1356,19 @@ const Services = () => {
           }
         }
 
-        .quantum-container {
+        @keyframes pulse {
+          0% {
+            opacity: 0.3;
+          }
+          50% {
+            opacity: 0.5;
+          }
+          100% {
+            opacity: 0.3;
+          }
+        }
+
+        .hyper-container {
           width: 100%;
           max-width: 1400px;
           margin: 0 auto;
@@ -892,20 +1378,20 @@ const Services = () => {
         }
 
         /* Title Section */
-        .quantum-title-container {
+        .hyper-title-container {
           text-align: center;
           margin-bottom: 4rem;
           position: relative;
           z-index: 2;
         }
 
-        .quantum-badge-wrapper {
+        .hyper-badge-wrapper {
           display: flex;
           justify-content: center;
           margin-bottom: 1rem;
         }
 
-        .quantum-badge {
+        .hyper-badge {
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -918,18 +1404,26 @@ const Services = () => {
           border-radius: 20px;
           position: relative;
           overflow: hidden;
+          box-shadow: 0 0 15px rgba(5, 217, 232, 0.3);
         }
 
-        .quantum-badge-text {
+        .hyper-badge-text {
           font-size: 0.75rem;
           font-weight: 700;
           letter-spacing: 1px;
           color: var(--primary);
           position: relative;
           z-index: 1;
+          margin-right: 0.5rem;
         }
 
-        .quantum-badge-glow {
+        .hyper-badge-icon {
+          color: var(--primary);
+          position: relative;
+          z-index: 1;
+        }
+
+        .hyper-badge-glow {
           position: absolute;
           top: 0;
           left: 0;
@@ -945,11 +1439,11 @@ const Services = () => {
           mix-blend-mode: overlay;
         }
 
-        .quantum-badge:hover .quantum-badge-glow {
+        .hyper-badge:hover .hyper-badge-glow {
           opacity: 1;
         }
 
-        .quantum-title {
+        .hyper-title {
           font-family: "Orbitron", sans-serif;
           font-size: 2.5rem;
           font-weight: 700;
@@ -968,19 +1462,19 @@ const Services = () => {
         }
 
         @media (min-width: 768px) {
-          .quantum-title {
+          .hyper-title {
             font-size: 3rem;
           }
         }
 
-        .quantum-highlight {
+        .hyper-highlight {
           color: var(--secondary);
           text-shadow: 0 0 10px var(--secondary-glow);
           position: relative;
           display: inline-block;
         }
 
-        .quantum-highlight::after {
+        .hyper-highlight::after {
           content: "";
           position: absolute;
           bottom: -5px;
@@ -996,34 +1490,47 @@ const Services = () => {
           box-shadow: 0 0 10px var(--secondary-glow);
         }
 
-        .quantum-title-underline {
+        .hyper-title-underline {
           width: 100px;
           height: 3px;
           background: linear-gradient(90deg, var(--tertiary), transparent);
           margin: 0 auto;
         }
 
-        /* Service Cards */
-        .quantum-service-container {
-          position: relative;
-          z-index: 2;
-          margin-bottom: 3rem;
+        .hyper-subtitle {
+          font-size: 1.1rem;
+          color: var(--text-secondary);
+          margin-top: 1rem;
+          max-width: 600px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
-        /* 5000-Era Hyper Carousel */
-        .hyper-carousel {
+        /* Carousel */
+        .hyper-carousel-container {
           position: relative;
-          width: 100%;
-          overflow: hidden;
           margin-bottom: 3rem;
+          overflow: hidden;
+        }
+
+        .hyper-carousel-track-container {
+          position: relative;
+          overflow: hidden;
+          padding: 20px 0;
+          margin: 0 -20px;
         }
 
         .hyper-carousel-track {
           display: flex;
           gap: 20px;
-          transition: transform 0.05s linear; /* Smoother for auto-scrolling */
-          padding: 20px 0;
+          padding: 20px;
+          cursor: grab;
           will-change: transform;
+          transition: transform 0.1s linear;
+        }
+
+        .hyper-carousel-track:active {
+          cursor: grabbing;
         }
 
         .hyper-service-card {
@@ -1031,8 +1538,8 @@ const Services = () => {
           flex: 0 0 300px;
           height: 350px;
           background: rgba(10, 14, 23, 0.5);
-          backdrop-filter: blur(5px); /* Reduced blur for better performance */
-          -webkit-backdrop-filter: blur(5px);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
           border-radius: 12px;
           border: 1px solid var(--glass-border);
           overflow: hidden;
@@ -1044,7 +1551,7 @@ const Services = () => {
           will-change: transform, opacity;
         }
 
-        .hyper-service-card.active,
+        .hyper-service-card.hovered,
         .hyper-service-card:hover {
           opacity: 1;
           transform: scale(1) translateY(-10px);
@@ -1053,6 +1560,15 @@ const Services = () => {
             inset 0 0 20px rgba(var(--card-color), 0.1);
           border-color: var(--card-color, var(--tertiary));
           z-index: 2;
+        }
+
+        .hyper-service-card.expanded {
+          opacity: 1;
+          transform: scale(1.05);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px var(--card-color),
+            inset 0 0 30px rgba(var(--card-color), 0.2);
+          border-color: var(--card-color);
+          z-index: 10;
         }
 
         .hyper-service-card::before {
@@ -1082,7 +1598,8 @@ const Services = () => {
 
         .hyper-card-header {
           display: flex;
-          align-items: center;
+          flex-direction: column;
+          align-items: flex-start;
           margin-bottom: 1.5rem;
         }
 
@@ -1095,7 +1612,7 @@ const Services = () => {
           justify-content: center;
           background: rgba(255, 255, 255, 0.1);
           border-radius: 12px;
-          margin-right: 1rem;
+          margin-bottom: 1rem;
           overflow: hidden;
         }
 
@@ -1130,6 +1647,13 @@ const Services = () => {
           opacity: 1;
         }
 
+        .hyper-card-title-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+
         .hyper-card-title {
           font-size: 1.25rem;
           font-weight: 600;
@@ -1144,18 +1668,96 @@ const Services = () => {
           text-shadow: 0 0 5px var(--card-color, var(--tertiary-glow));
         }
 
+        .hyper-expand-button {
+          background: transparent;
+          border: none;
+          color: var(--text-secondary);
+          cursor: pointer;
+          padding: 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+        }
+
+        .hyper-expand-button:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--card-color, var(--tertiary));
+        }
+
         .hyper-card-body {
           flex: 1;
+          overflow: hidden;
         }
 
         .hyper-card-description {
           font-size: 0.95rem;
           line-height: 1.6;
           color: var(--text-secondary);
+          margin: 0 0 1rem 0;
+        }
+
+        .hyper-card-features {
+          margin-top: 1rem;
+          overflow: hidden;
+        }
+
+        .hyper-features-title {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--text);
+          margin: 0 0 0.5rem 0;
+        }
+
+        .hyper-features-list {
+          list-style: none;
+          padding: 0;
           margin: 0;
         }
 
-        /* Simplified holographic elements */
+        .hyper-feature-item {
+          display: flex;
+          align-items: center;
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          margin-bottom: 0.5rem;
+        }
+
+        .hyper-feature-icon {
+          color: var(--card-color, var(--tertiary));
+          margin-right: 0.5rem;
+        }
+
+        .hyper-card-footer {
+          margin-top: auto;
+        }
+
+        .hyper-card-button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.5rem 1rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid var(--glass-border);
+          border-radius: 6px;
+          color: var(--text);
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .hyper-card-button:hover {
+          background: var(--card-color, var(--tertiary));
+          color: var(--primary);
+        }
+
+        .hyper-button-icon {
+          margin-left: 0.5rem;
+        }
+
+        /* Holographic elements */
         .hyper-card-hologram {
           position: absolute;
           top: 0;
@@ -1175,107 +1777,157 @@ const Services = () => {
           transition: all 0.3s ease;
         }
 
+        .top-left {
+          top: 10px;
+          left: 10px;
+          border-top: 2px solid;
+          border-left: 2px solid;
+        }
+
+        .top-right {
+          top: 10px;
+          right: 10px;
+          border-top: 2px solid;
+          border-right: 2px solid;
+        }
+
+        .bottom-left {
+          bottom: 10px;
+          left: 10px;
+          border-bottom: 2px solid;
+          border-left: 2px solid;
+        }
+
+        .bottom-right {
+          bottom: 10px;
+          right: 10px;
+          border-bottom: 2px solid;
+          border-right: 2px solid;
+        }
+
+        .hologram-circle {
+          position: absolute;
+          bottom: -50px;
+          right: -50px;
+          width: 100px;
+          height: 100px;
+          border: 1px solid var(--card-color, var(--tertiary));
+          border-radius: 50%;
+          opacity: 0.2;
+          transition: all 0.3s ease;
+        }
+
         .hyper-service-card:hover .hologram-corner {
           opacity: 0.6;
           width: 20px;
           height: 20px;
         }
 
+        .hyper-service-card:hover .hologram-circle {
+          opacity: 0.4;
+          transform: scale(1.2);
+        }
+
         /* Carousel controls */
         .hyper-carousel-controls {
           display: flex;
+          align-items: center;
           justify-content: center;
           margin-top: 2rem;
+          gap: 1rem;
         }
 
-        .hyper-carousel-dots {
+        .hyper-carousel-arrow {
           display: flex;
-          gap: 8px;
-        }
-
-        .hyper-dot {
-          width: 12px;
-          height: 12px;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid var(--glass-border);
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.2);
-          border: none;
-          transition: all 0.3s ease;
+          color: var(--text);
           cursor: pointer;
-          padding: 0;
+          transition: all 0.3s ease;
         }
 
-        .hyper-dot.active {
+        .hyper-carousel-arrow:hover {
+          background: rgba(255, 255, 255, 0.2);
+          box-shadow: 0 0 15px rgba(5, 217, 232, 0.3);
+        }
+
+        .arrow-icon {
+          width: 20px;
+          height: 20px;
+        }
+
+        .hyper-carousel-speed {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .speed-label {
+          font-size: 0.75rem;
+          color: var(--text-secondary);
+          margin-bottom: 0.25rem;
+        }
+
+        .speed-control {
+          display: flex;
+          gap: 5px;
+        }
+
+        .speed-button {
+          padding: 0.25rem 0.5rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid var(--glass-border);
+          border-radius: 4px;
+          color: var(--text-secondary);
+          font-size: 0.75rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .speed-button:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .speed-button.active {
           background: var(--tertiary);
-          box-shadow: 0 0 10px var(--tertiary-glow);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-          .hyper-service-card {
-            flex: 0 0 280px;
-            height: 320px;
-          }
-
-          .hyper-card-title {
-            font-size: 1.1rem;
-          }
-
-          .hyper-card-description {
-            font-size: 0.85rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .hyper-service-card {
-            flex: 0 0 260px;
-            height: 300px;
-          }
-
-          .hyper-card-header {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-
-          .hyper-icon-container {
-            margin-bottom: 1rem;
-            margin-right: 0;
-          }
-        }
-        /* 5000-Era Hyper Carousel */
-        .quantum-carousel-container {
-          padding-bottom: 3rem;
-        }
-
-        .quantum-carousel-item {
-          padding: 15px;
+          color: var(--primary);
         }
 
         /* CTA Button */
-        .quantum-cta-container {
+        .hyper-cta-container {
           display: flex;
           justify-content: center;
           margin-top: 2rem;
-          position: relative;
-          z-index: 2;
         }
 
-        .quantum-button {
+        .hyper-button {
           position: relative;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           padding: 0.75rem 2rem;
-          color: var(--text);
+          background: linear-gradient(
+            135deg,
+            var(--secondary) 0%,
+            rgba(238, 131, 77, 0.8) 100%
+          );
+          color: var(--primary);
           font-size: 0.875rem;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 2px;
-          border-radius: 30px;
+          border-radius: 8px;
           border: none;
           cursor: pointer;
           overflow: hidden;
           transition: all var(--transition-medium);
           text-decoration: none;
+          box-shadow: 0 5px 15px rgba(238, 131, 77, 0.3);
           z-index: 1;
         }
 
@@ -1290,18 +1942,34 @@ const Services = () => {
             var(--secondary) 0%,
             rgba(238, 131, 77, 0.8) 100%
           );
-          border-radius: 30px;
+          border-radius: 8px;
           z-index: -1;
           transition: all var(--transition-medium);
         }
 
-        .quantum-button-text {
+        .hyper-button:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 20px rgba(238, 131, 77, 0.4);
+        }
+
+        .hyper-button:hover .button-background {
+          filter: brightness(1.2);
+        }
+
+        .hyper-button-text {
           position: relative;
           z-index: 2;
           margin-right: 0.5rem;
         }
 
-        .quantum-button-glow {
+        .hyper-button-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform var(--transition-medium);
+        }
+
+        .hyper-button-glow {
           position: absolute;
           top: 0;
           left: 0;
@@ -1318,33 +1986,11 @@ const Services = () => {
           z-index: 1;
         }
 
-        .quantum-button-icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: transform var(--transition-medium);
-        }
-
-        .quantum-button:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2),
-            0 0 15px var(--secondary-glow);
-        }
-
-        .quantum-button:hover .button-background {
-          filter: brightness(1.2);
-        }
-
-        .quantum-button:hover .quantum-button-glow {
+        .hyper-button:hover .hyper-button-glow {
           opacity: 1;
-          animation: pulse 2s infinite;
         }
 
-        .quantum-button:hover .quantum-button-icon {
-          transform: translateX(5px);
-        }
-
-        .quantum-button-particles {
+        .hyper-button-particles {
           position: absolute;
           top: 0;
           left: 0;
@@ -1354,8 +2000,8 @@ const Services = () => {
           z-index: 0;
         }
 
-        .quantum-button-particles::before,
-        .quantum-button-particles::after {
+        .hyper-button-particles::before,
+        .hyper-button-particles::after {
           content: "";
           position: absolute;
           width: 10px;
@@ -1367,32 +2013,19 @@ const Services = () => {
           opacity: 0;
         }
 
-        .quantum-button-particles::before {
+        .hyper-button-particles::before {
           left: -10px;
           animation: particleLeft 2s infinite;
         }
 
-        .quantum-button-particles::after {
+        .hyper-button-particles::after {
           right: -10px;
           animation: particleRight 2s infinite;
         }
 
-        .quantum-button:hover .quantum-button-particles::before,
-        .quantum-button:hover .quantum-button-particles::after {
+        .hyper-button:hover .hyper-button-particles::before,
+        .hyper-button:hover .hyper-button-particles::after {
           opacity: 1;
-        }
-
-        /* Animations */
-        @keyframes pulse {
-          0% {
-            opacity: 0.5;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0.5;
-          }
         }
 
         @keyframes particleLeft {
@@ -1425,97 +2058,186 @@ const Services = () => {
           }
         }
 
-        @keyframes rotate {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-
         /* Responsive Adjustments */
-        @media (max-width: 991px) {
-          .quantum-services-section {
-            padding: 6rem 0;
-          }
-
-          .quantum-title {
-            font-size: 2.25rem;
+        /* Update responsive styles for better mobile experience */
+        @media (max-width: 1024px) {
+          .hyper-service-card {
+            flex: 0 0 280px;
+            height: 330px;
           }
         }
 
         @media (max-width: 768px) {
-          .quantum-services-section {
+          .hyper-services-section {
+            padding: 5rem 0;
+          }
+
+          .hyper-title {
+            font-size: 2.25rem;
+          }
+
+          .hyper-service-card {
+            flex: 0 0 240px;
+            height: 320px;
+          }
+
+          .hyper-card-content {
+            padding: 1.25rem;
+          }
+
+          .hyper-carousel-track-container {
+            margin: 0 -10px;
+          }
+
+          .hyper-carousel-track {
+            gap: 15px;
+            padding: 15px 10px;
+          }
+
+          .hyper-carousel-controls {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hyper-services-section {
             padding: 4rem 0;
           }
 
-          .quantum-title {
+          .hyper-container {
+            padding: 0 1rem;
+          }
+
+          .hyper-title {
             font-size: 1.75rem;
           }
 
-          .quantum-card-title {
-            font-size: 1.1rem;
+          .hyper-service-card {
+            flex: 0 0 220px;
+            height: 300px;
           }
 
-          .quantum-card-description {
+          .hyper-card-title {
+            font-size: 1rem;
+          }
+
+          .hyper-card-description {
             font-size: 0.85rem;
+            line-height: 1.5;
           }
 
-          .quantum-service-card {
-            height: 320px;
+          .hyper-icon-container {
+            width: 50px;
+            height: 50px;
+          }
+
+          .hyper-icon {
+            width: 40px;
+            height: 40px;
+          }
+
+          .hyper-card-features {
+            margin-top: 0.75rem;
+          }
+
+          .hyper-features-title {
+            font-size: 0.9rem;
+          }
+
+          .hyper-feature-item {
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+          }
+
+          .hyper-card-button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+          }
+
+          .hyper-service-card.expanded {
+            height: 380px;
           }
         }
 
         @media (max-width: 480px) {
-          .quantum-container {
-            padding: 0 1rem;
-          }
-
-          .quantum-title-container {
+          .hyper-title-container {
             margin-bottom: 2rem;
           }
 
-          .quantum-badge {
+          .hyper-badge {
             padding: 0.4rem 0.8rem;
           }
 
-          .quantum-badge-text {
+          .hyper-badge-text {
             font-size: 0.7rem;
           }
 
-          .quantum-title {
+          .hyper-title {
             font-size: 1.5rem;
           }
 
-          .quantum-service-card {
-            height: 300px;
+          .hyper-service-card {
+            flex: 0 0 200px;
+            height: 280px;
           }
 
-          .quantum-card-header {
-            flex-direction: column;
-            align-items: flex-start;
+          .hyper-card-content {
+            padding: 1rem;
           }
 
-          .quantum-icon-container {
-            margin-bottom: 1rem;
-            margin-right: 0;
+          .hyper-carousel-controls {
+            margin-top: 1.5rem;
+          }
+
+          .hyper-carousel-arrow {
+            width: 36px;
+            height: 36px;
+          }
+
+          .speed-button {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.7rem;
+          }
+
+          .hyper-button {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.8rem;
           }
         }
 
-        /* Prefers reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-          .scanning-line,
-          .scanning-line.horizontal,
-          .quantum-button-particles::before,
-          .quantum-button-particles::after,
-          .hologram-circle,
-          .hologram-dot {
-            animation: none;
+        /* Add specific styles for expanded cards on mobile */
+        @media (max-width: 640px) {
+          .hyper-service-card.expanded {
+            width: 105% !important;
+            z-index: 10;
+          }
+        }
+
+        /* Add touch-specific optimizations */
+        @media (hover: none) {
+          .hyper-service-card:hover {
+            transform: none;
           }
 
-          .quantum-services-section {
-            transition: none;
+          .hyper-service-card.hovered {
+            transform: translateY(-5px);
+          }
+
+          .hyper-carousel-track {
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .hyper-carousel-controls {
+            padding: 0.5rem 0;
+          }
+
+          .speed-control {
+            gap: 8px;
+          }
+
+          .speed-button {
+            min-width: 30px;
           }
         }
       `}</style>
