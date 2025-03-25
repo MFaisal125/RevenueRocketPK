@@ -675,6 +675,124 @@
 // };
 // export default Background;
 
+// "use client";
+
+// import { useCallback, useEffect, useState, memo } from "react";
+// import Particles from "react-tsparticles";
+// import { loadFull } from "tsparticles";
+
+// // Ultra-optimized background component with aggressive performance optimization
+// const Background = memo(() => {
+//   const [deviceTier, setDeviceTier] = useState("minimal");
+
+//   // Simple device detection on mount only
+//   useEffect(() => {
+//     if (typeof window !== "undefined") {
+//       // One-time check for device capability
+//       const detectDevice = () => {
+//         if (window.innerWidth < 1024) return "minimal";
+//         if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
+//           return "minimal";
+//         return "high";
+//       };
+
+//       setDeviceTier(detectDevice());
+//     }
+//   }, []);
+
+//   // Minimal initialization for particles
+//   const particlesInit = useCallback(async (engine) => {
+//     await loadFull(engine);
+//   }, []);
+
+//   // Static gradient background for most devices
+//   if (deviceTier === "minimal") {
+//     return (
+//       <div className="static-background">
+//         <style jsx>{`
+//           .static-background {
+//             position: absolute;
+//             top: 0;
+//             left: 0;
+//             width: 100%;
+//             height: 100%;
+//             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+//             z-index: -1;
+//           }
+//         `}</style>
+//       </div>
+//     );
+//   }
+
+//   // Ultra-minimal particles for high-end devices only
+//   const particleOptions = {
+//     fpsLimit: 30,
+//     particles: {
+//       number: { value: 15, density: { enable: true, value_area: 800 } },
+//       color: { value: "#ffffff" },
+//       shape: { type: "circle" },
+//       opacity: { value: 0.4, random: false },
+//       size: { value: 1, random: false },
+//       move: {
+//         enable: true,
+//         speed: 0.5,
+//         direction: "none",
+//         random: false,
+//         straight: false,
+//         outModes: { default: "out" },
+//       },
+//       links: {
+//         enable: true,
+//         distance: 150,
+//         color: "#ffffff",
+//         opacity: 0.2,
+//         width: 1,
+//       },
+//     },
+//     interactivity: {
+//       detectsOn: "canvas",
+//       events: {
+//         onHover: { enable: false },
+//         onClick: { enable: false },
+//         resize: true,
+//       },
+//     },
+//     detectRetina: false,
+//     background: {
+//       color: "#000",
+//       image: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
+//       position: "50% 50%",
+//       repeat: "no-repeat",
+//       size: "cover",
+//     },
+//   };
+
+//   return (
+//     <div className="particles-container">
+//       <Particles
+//         id="tsparticles"
+//         init={particlesInit}
+//         options={particleOptions}
+//       />
+//       <style jsx>{`
+//         .particles-container {
+//           position: absolute;
+//           top: 0;
+//           left: 0;
+//           width: 100%;
+//           height: 100%;
+//           z-index: -1;
+//           overflow: hidden;
+//           contain: strict;
+//         }
+//       `}</style>
+//     </div>
+//   );
+// });
+
+// Background.displayName = "Background";
+// export default Background;
+
 "use client";
 
 import { useCallback, useEffect, useState, memo } from "react";
