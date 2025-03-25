@@ -1,1 +1,1 @@
-this is a building with AI technologies.
+Latest version of the website using AI.

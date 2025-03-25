@@ -127,7 +127,6 @@ const TeamSlider = lazy(() => import("../../components/TeamSlider/TeamSlider"));
 const ClientSay = lazy(() => import("../../components/ClientSay/ClientSay"));
 const Blogs = lazy(() => import("../../components/Blogs/Blogs"));
 
-// Minimal loading placeholder
 const LoadingPlaceholder = () => (
   <div className="loading-placeholder">
     <div className="loading-spinner"></div>
