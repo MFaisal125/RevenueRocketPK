@@ -78,15 +78,68 @@
   </script>
   <title>Revenue Rocket</title>
   <style>
-    *::-webkit-scrollbar {
-      width: 5px;
-      background-color: #38465f;
+    /* Premium Scrollbar Styling */
+    /* Main scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+      background-color: rgba(15, 15, 25, 0.05);
+      transition: all 0.3s ease;
     }
 
-    *::-webkit-scrollbar-thumb {
-      width: 10px;
-      background-color: #fff;
+    /* Track styling - the area behind the thumb */
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 15, 25, 0.05);
       border-radius: 10px;
+      margin: 4px 0;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Handle styling - the draggable part */
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #6157ff, #74b9ff);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(97, 87, 255, 0.3);
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #74b9ff, #6157ff);
+      box-shadow: 0 0 15px rgba(97, 87, 255, 0.5);
+    }
+
+    /* Handle when active/being dragged */
+    ::-webkit-scrollbar-thumb:active {
+      background: linear-gradient(135deg, #5a50f5, #65a6e6);
+    }
+
+    /* Corner where horizontal and vertical scrollbars meet */
+    ::-webkit-scrollbar-corner {
+      background: rgba(15, 15, 25, 0.05);
+    }
+
+    /* Firefox scrollbar styling */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #6157ff rgba(15, 15, 25, 0.05);
+    }
+
+    /* Smooth scrolling for the entire page */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Scrollbar styling for specific elements if needed */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #6157ff, #74b9ff);
+      border-radius: 8px;
     }
 
     body {
@@ -113,14 +166,30 @@
       max-width: 345px;
       width: 100%;
       background: #fff;
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 15px 25px 22px;
       transition: right 0.3s ease;
-      box-shadow: 0 5px 10px rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1),
+        0 1px 8px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(0, 0, 0, 0.01);
+      backdrop-filter: blur(10px);
     }
 
     .cookei_wrapper.show {
       right: 20px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
     }
 
     .cookei_wrapper .cookei_header {
@@ -132,15 +201,17 @@
     }
 
     .cookei_header i {
-      color: #0000FF;
+      color: #6157ff;
       font-size: 32px;
+      filter: drop-shadow(0 2px 4px rgba(97, 87, 255, 0.3));
     }
 
     .cookei_header h2 {
-      color: #0000FF;
+      color: #6157ff;
       vertical-align: middle;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 20px;
+      text-shadow: 0 1px 2px rgba(97, 87, 255, 0.2);
     }
 
     .cookei_wrapper .data {
@@ -150,51 +221,60 @@
     .cookei_wrapper .data p {
       color: #333;
       font-size: 16px;
+      line-height: 1.5;
     }
 
     .data p a {
-      color: #0000FF;
+      color: #6157ff;
       text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
 
     .data p a:hover {
       text-decoration: underline;
+      color: #74b9ff;
     }
 
     .cookei_wrapper .buttons {
-      margin-top: 16px;
+      margin-top: 20px;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
 
     .buttons .button {
       border: none;
       color: #fff;
-      padding: 8px 0;
-      border-radius: 4px;
+      padding: 10px 0;
+      border-radius: 8px;
       font-size: 16px;
-      background: #0000FF;
+      font-weight: 500;
+      background: linear-gradient(135deg, #6157ff, #74b9ff);
       cursor: pointer;
-      width: calc(100% / 2 - 10px);
-      transition: all 0.2s ease;
+      width: calc(100% / 2 - 6px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(97, 87, 255, 0.3);
     }
 
     .buttons #acceptBtn:hover {
-      background-color: #0000FF;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(97, 87, 255, 0.4);
     }
 
     #declineBtn {
-      border: 2px solid #0000FF;
-      background-color: #fff;
-      color: #0000FF;
+      border: 2px solid #6157ff;
+      background: transparent;
+      color: #6157ff;
       font-size: 16px;
+      box-shadow: none;
     }
 
     #declineBtn:hover {
-      background-color: #0000FF;
-      color: #fff;
+      background: rgba(97, 87, 255, 0.1);
+      transform: translateY(-2px);
     }
   </style>
 </head>
