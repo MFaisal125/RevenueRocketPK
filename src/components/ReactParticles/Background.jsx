@@ -793,164 +793,19 @@
 // // Background.displayName = "Background";
 // // export default Background;
 
-import { useCallback, useEffect, useState, memo } from "react";
-import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
+"use client";
 
-// Ultra-optimized background component with performance optimization
-const Background = memo(() => {
-  const [deviceTier, setDeviceTier] = useState("minimal");
-  const [isClient, setIsClient] = useState(false);
-
-  // Check if we're in the browser
-  useEffect(() => {
-    setIsClient(true);
-
-    if (typeof window !== "undefined") {
-      // One-time check for device capability
-      const detectDevice = () => {
-        if (window.innerWidth < 1024) return "minimal";
-        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
-          return "minimal";
-        return "high";
-      };
-
-      setDeviceTier(detectDevice());
-    }
-  }, []);
-
-  // Minimal initialization for particles
-  const particlesInit = useCallback(async (engine) => {
-    try {
-      await loadFull(engine);
-    } catch (error) {
-      console.error("Failed to load particles:", error);
-    }
-  }, []);
-
-  // If not client-side yet, return a simple placeholder
-  if (!isClient) {
-    return (
-      <div className="static-background-placeholder">
-        <style jsx>{`
-          .static-background-placeholder {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            z-index: -1;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  // Static gradient background for most devices
-  if (deviceTier === "minimal") {
-    return (
-      <div className="static-background">
-        <style jsx>{`
-          .static-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            z-index: -1;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  // Premium particles for high-end devices only
-  const particleOptions = {
-    fpsLimit: 60,
-    particles: {
-      number: { value: 30, density: { enable: true, value_area: 800 } },
-      color: { value: "#ffffff" },
-      shape: { type: "triangle" },
-      opacity: {
-        value: 0.5,
-        random: true,
-        anim: {
-          enable: true,
-          speed: 0.5,
-          opacity_min: 0.1,
-          sync: false,
-        },
-      },
-      size: {
-        value: 3,
-        random: true,
-        anim: {
-          enable: true,
-          speed: 2,
-          size_min: 0.1,
-          sync: false,
-        },
-      },
-      move: {
-        enable: true,
-        speed: 1.5,
-        direction: "none",
-        random: true,
-        straight: false,
-        outModes: { default: "out" },
-      },
-      links: {
-        enable: true,
-        distance: 150,
-        color: "#ffffff",
-        opacity: 0.3,
-        width: 1,
-      },
-    },
-    interactivity: {
-      detectsOn: "canvas",
-      events: {
-        onHover: {
-          enable: true,
-          mode: "grab",
-        },
-        onClick: {
-          enable: true,
-          mode: "push",
-        },
-        resize: true,
-      },
-      modes: {
-        grab: {
-          distance: 140,
-          links: { opacity: 0.5 },
-        },
-        push: {
-          quantity: 4,
-        },
-      },
-    },
-    detectRetina: true,
-    background: {
-      color: "#000",
-      image: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
-      position: "50% 50%",
-      repeat: "no-repeat",
-      size: "cover",
-    },
-  };
-
+// Ultra-simplified background component that works in all environments
+const Background = () => {
   return (
-    <div className="particles-container">
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        options={particleOptions}
-      />
+    <div className="background-wrapper">
+      <div className="static-background"></div>
+
+      {/* We'll load particles dynamically only after component mounts */}
+      <div id="particles-container"></div>
+
       <style jsx>{`
-        .particles-container {
+        .background-wrapper {
           position: absolute;
           top: 0;
           left: 0;
@@ -958,12 +813,141 @@ const Background = memo(() => {
           height: 100%;
           z-index: -1;
           overflow: hidden;
-          contain: strict;
+        }
+
+        .static-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+          z-index: -1;
+        }
+
+        #particles-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
         }
       `}</style>
+
+      {/* Load particles with a script tag to avoid SSR issues */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+        // Initialize particles only after everything is loaded
+        window.addEventListener('load', function() {
+          // Dynamically import the particles libraries
+          const loadParticles = async () => {
+            try {
+              // Check if we're on a capable device
+              const isMobile = window.innerWidth < 1024;
+              const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+              
+              if (isMobile || isLowEndDevice) {
+                // Don't load particles on low-end devices
+                return;
+              }
+              
+              // Dynamically import the libraries
+              const tsParticlesModule = await import('react-tsparticles');
+              const tsParticles = tsParticlesModule.default || tsParticlesModule;
+              
+              const loadFullModule = await import('tsparticles');
+              const loadFull = loadFullModule.loadFull;
+              
+              // Initialize particles
+              const engine = tsParticles.engine || tsParticles;
+              await loadFull(engine);
+              
+              // Load particles into the container
+              await tsParticles.load('particles-container', {
+                fpsLimit: 60,
+                particles: {
+                  number: { value: 30, density: { enable: true, value_area: 800 } },
+                  color: { value: "#ffffff" },
+                  shape: { type: "triangle" },
+                  opacity: { 
+                    value: 0.5, 
+                    random: true,
+                    anim: {
+                      enable: true,
+                      speed: 0.5,
+                      opacity_min: 0.1,
+                      sync: false
+                    }
+                  },
+                  size: { 
+                    value: 3, 
+                    random: true,
+                    anim: {
+                      enable: true,
+                      speed: 2,
+                      size_min: 0.1,
+                      sync: false
+                    }
+                  },
+                  move: {
+                    enable: true,
+                    speed: 1.5,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    outModes: { default: "out" },
+                  },
+                  links: {
+                    enable: true,
+                    distance: 150,
+                    color: "#ffffff",
+                    opacity: 0.3,
+                    width: 1,
+                  },
+                },
+                interactivity: {
+                  detectsOn: "canvas",
+                  events: {
+                    onHover: { 
+                      enable: true,
+                      mode: "grab" 
+                    },
+                    onClick: { 
+                      enable: true,
+                      mode: "push" 
+                    },
+                    resize: true,
+                  },
+                  modes: {
+                    grab: {
+                      distance: 140,
+                      links: { opacity: 0.5 }
+                    },
+                    push: {
+                      quantity: 4
+                    }
+                  }
+                },
+                detectRetina: true,
+                background: {
+                  color: "transparent",
+                }
+              });
+            } catch (error) {
+              console.error("Failed to load particles:", error);
+            }
+          };
+          
+          // Load particles with a slight delay to ensure page is fully rendered
+          setTimeout(loadParticles, 500);
+        });
+      `,
+        }}
+      />
     </div>
   );
-});
+};
 
-Background.displayName = "Background";
 export default Background;
