@@ -1282,8 +1282,10 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { NavLink } from "react-router-dom";
 import Header from "../../Common/Header/Headers";
 import Footer from "../../Common/Footer/Footer";
-import Background from "../../components/ReactParticles/Background";
 import Typewriter from "typewriter-effect";
+
+// Import Background directly to avoid SSR issues
+import Background from "../../components/ReactParticles/Background";
 
 // Lazy load content sections with priority loading
 const About = lazy(() => import("../../components/About/About"));
@@ -1305,9 +1307,17 @@ export const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Set client-side rendering flag
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Check if mobile
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -1318,11 +1328,11 @@ export const Home = () => {
     return () => {
       window.removeEventListener("resize", checkMobile);
     };
-  }, []);
+  }, [isClient]);
 
   // Optimized scroll handler
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || typeof window === "undefined") return;
 
     let ticking = false;
     let lastScrollY = 0;
@@ -1346,22 +1356,50 @@ export const Home = () => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isLoaded]);
+  }, [isLoaded, isClient]);
 
   // Initial load animation
   useEffect(() => {
-    if (window.requestIdleCallback) {
-      window.requestIdleCallback(() => {
-        setIsLoaded(true);
-        setIsVisible(true);
-      });
-    } else {
-      setTimeout(() => {
-        setIsLoaded(true);
-        setIsVisible(true);
-      }, 100);
-    }
-  }, []);
+    if (typeof window === "undefined") return;
+
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+      setIsVisible(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isClient]);
+
+  // If not client-side yet, show minimal content
+  if (!isClient) {
+    return (
+      <div className="loading-state">
+        <div className="loading-spinner-initial"></div>
+        <style jsx>{`
+          .loading-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+          }
+          .loading-spinner-initial {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="ultra-premium-home">

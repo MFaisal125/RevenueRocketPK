@@ -793,8 +793,6 @@
 // // Background.displayName = "Background";
 // // export default Background;
 
-"use client";
-
 import { useCallback, useEffect, useState, memo } from "react";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
@@ -802,9 +800,12 @@ import { loadFull } from "tsparticles";
 // Ultra-optimized background component with performance optimization
 const Background = memo(() => {
   const [deviceTier, setDeviceTier] = useState("minimal");
+  const [isClient, setIsClient] = useState(false);
 
-  // Device detection on mount only
+  // Check if we're in the browser
   useEffect(() => {
+    setIsClient(true);
+
     if (typeof window !== "undefined") {
       // One-time check for device capability
       const detectDevice = () => {
@@ -820,8 +821,31 @@ const Background = memo(() => {
 
   // Minimal initialization for particles
   const particlesInit = useCallback(async (engine) => {
-    await loadFull(engine);
+    try {
+      await loadFull(engine);
+    } catch (error) {
+      console.error("Failed to load particles:", error);
+    }
   }, []);
+
+  // If not client-side yet, return a simple placeholder
+  if (!isClient) {
+    return (
+      <div className="static-background-placeholder">
+        <style jsx>{`
+          .static-background-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            z-index: -1;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   // Static gradient background for most devices
   if (deviceTier === "minimal") {
