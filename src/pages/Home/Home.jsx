@@ -623,6 +623,7 @@ export const Home = () => {
           color: white;
           font-weight: 600;
           font-size: 13px;
+          margin-left: -0.1rem;
           border-radius: 6px;
           border: 1px solid rgba(255, 255, 255, 0.2);
           transition: all 0.3s ease;
