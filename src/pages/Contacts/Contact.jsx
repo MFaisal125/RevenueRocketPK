@@ -318,35 +318,38 @@ import "../../assets/css/media-query.css";
 import contact_video from "../../assets/video/contact-us.mp4";
 import contactVideo_banner from "../../assets/video/contact_video_banner.jpg";
 
-// EmailJS credentials directly in the component
+// EmailJS credentials
 const EMAIL_SERVICE_ID = "service_v4hquk1";
 const EMAIL_TEMPLATE_ID = "template_nsjhh6h";
 const EMAIL_USER_ID = "D3nQulaSLpUIaocqG";
-
-// Add this right after the constants (EMAIL_SERVICE_ID, etc.)
-// Initialize EmailJS
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
+    subject: "",
     description: "",
+    phone: "",
+    company: "",
   });
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVisible, setIsVisible] = useState({});
   const [mapHovered, setMapHovered] = useState(false);
+  const [activeTab, setActiveTab] = useState("general");
+  const [formSuccess, setFormSuccess] = useState(false);
+
   const formRef = useRef(null);
   const contactInfoRef = useRef(null);
   const mapRef = useRef(null);
+  const videoRef = useRef(null);
 
+  // Initialize EmailJS
   useEffect(() => {
-    // Initialize EmailJS with the user ID
-    let isMounted = true; // Add a flag to track component mount status
+    let isMounted = true;
 
     const initializeEmailJS = async () => {
       try {
-        console.log("Initializing EmailJS with user ID:", EMAIL_USER_ID);
         await emailjs.init(EMAIL_USER_ID);
         if (isMounted) {
           console.log("EmailJS initialized successfully");
@@ -361,11 +364,11 @@ const Contact = () => {
     initializeEmailJS();
 
     return () => {
-      isMounted = false; // Set the flag to false when the component unmounts
+      isMounted = false;
     };
   }, []);
 
-  // Animation on scroll with IntersectionObserver
+  // Animation on scroll with IntersectionObserver - simplified for performance
   useEffect(() => {
     const observerOptions = {
       root: null,
@@ -396,11 +399,45 @@ const Contact = () => {
     };
   }, []);
 
+  // Video play/pause based on visibility
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.5,
+    };
+
+    const handleVideoIntersect = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && videoRef.current) {
+          videoRef.current.play();
+        } else if (videoRef.current) {
+          videoRef.current.pause();
+        }
+      });
+    };
+
+    const videoObserver = new IntersectionObserver(
+      handleVideoIntersect,
+      options
+    );
+
+    if (videoRef.current) {
+      videoObserver.observe(videoRef.current);
+    }
+
+    return () => {
+      if (videoRef.current) {
+        videoObserver.unobserve(videoRef.current);
+      }
+    };
+  }, [videoRef.current]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value.trim(),
+      [name]: value,
     });
 
     // Clear error when user starts typing
@@ -414,6 +451,8 @@ const Contact = () => {
 
   const validateForm = () => {
     const errors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
 
     if (!formData.username.trim()) {
       errors.username = "Name is required";
@@ -421,12 +460,20 @@ const Contact = () => {
 
     if (!formData.email.trim()) {
       errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!emailRegex.test(formData.email)) {
       errors.email = "Email address is invalid";
+    }
+
+    if (!formData.subject.trim()) {
+      errors.subject = "Subject is required";
     }
 
     if (!formData.description.trim()) {
       errors.description = "Message is required";
+    }
+
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      errors.phone = "Phone number is invalid";
     }
 
     setFormErrors(errors);
@@ -434,14 +481,38 @@ const Contact = () => {
   };
 
   const alert_message = (message, type = "info") => {
-    toast(message, { type });
+    toast(message, {
+      type,
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      style: {
+        background:
+          type === "success"
+            ? "#10b981"
+            : type === "error"
+            ? "#ef4444"
+            : "#3b82f6",
+        color: "#fff",
+        borderRadius: "10px",
+        boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
+      },
+    });
   };
 
   const resetForm = () => {
     setFormData({
       username: "",
       email: "",
+      subject: "",
       description: "",
+      phone: "",
+      company: "",
     });
   };
 
@@ -456,15 +527,17 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Direct EmailJS send approach (similar to contactform22.jsx)
-      console.log("Sending email with EmailJS...");
-
+      // Prepare email parameters
       const emailParams = {
         name: formData.username,
         email: formData.email,
+        subject: formData.subject,
         message: formData.description,
+        phone: formData.phone || "Not provided",
+        company: formData.company || "Not provided",
       };
 
+      // Send email using EmailJS
       const emailResult = await emailjs.send(
         EMAIL_SERVICE_ID,
         EMAIL_TEMPLATE_ID,
@@ -480,14 +553,12 @@ const Contact = () => {
         // Success message and form reset
         alert_message("Thanks! We will connect with you very soon.", "success");
         resetForm();
+        setFormSuccess(true);
 
-        // Add success animation to form
-        if (formRef.current) {
-          formRef.current.classList.add("form-success");
-          setTimeout(() => {
-            formRef.current.classList.remove("form-success");
-          }, 1500);
-        }
+        // Reset success state after animation
+        setTimeout(() => {
+          setFormSuccess(false);
+        }, 3000);
       } else {
         throw new Error("Failed to send email");
       }
@@ -509,17 +580,43 @@ const Contact = () => {
     }
   };
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
   return (
     <>
       <Header tags={location.href} />
 
-      {/* Premium Banner - Matching the image design */}
+      {/* Premium Banner */}
       <div className="premium-banner">
+        <div className="banner-image-container">
+          <div className="banner-image"></div>
+        </div>
         <div className="banner-overlay"></div>
-        <div className="hexagon-pattern"></div>
+        {/* <div className="hexagon-pattern"></div> */}
         <div className="banner-content">
+          <div className="banner-badge">Get in Touch</div>
           <h1 className="banner-title">Contact Us</h1>
-          <div className="title-underline"></div>
+          <div className="title-underline">
+            <span></span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span></span>
+          </div>
           <p className="banner-subtitle">
             We're here to help and answer any questions you might have. We look
             forward to hearing from you.
@@ -529,10 +626,26 @@ const Contact = () => {
 
       <section id="contact-page">
         <div className="container">
-          <div className="section-header">
-            <span className="section-subtitle">Contact Information</span>
-            <h2 className="section-title">Get in Touch with Our Team</h2>
-            <div className="section-divider">
+          <div className="section-header animate-section" data-id="header">
+            <span
+              className={`section-subtitle fade-in ${
+                isVisible.header ? "visible" : ""
+              }`}
+            >
+              Contact Information
+            </span>
+            <h2
+              className={`section-title fade-in ${
+                isVisible.header ? "visible" : ""
+              }`}
+            >
+              Get in Touch with Our Team
+            </h2>
+            <div
+              className={`section-divider fade-in ${
+                isVisible.header ? "visible" : ""
+              }`}
+            >
               <span></span>
             </div>
           </div>
@@ -550,6 +663,7 @@ const Contact = () => {
                 }`}
               >
                 <video
+                  ref={videoRef}
                   poster={contactVideo_banner}
                   autoPlay
                   muted
@@ -558,9 +672,7 @@ const Contact = () => {
                   className="contact-video"
                   playsInline
                 ></video>
-                <div className="video-overlay">
-                  <div className="pulse-circle"></div>
-                </div>
+                <div className="video-overlay"></div>
               </div>
 
               <div
@@ -589,6 +701,7 @@ const Contact = () => {
                   <div className="contact-info-content">
                     <h4>Phone</h4>
                     <p>+923006223384</p>
+                    <span className="availability">Available 24/7</span>
                   </div>
                 </div>
 
@@ -612,6 +725,9 @@ const Contact = () => {
                   <div className="contact-info-content">
                     <h4>Email</h4>
                     <p>revenuerocket2@gmail.com</p>
+                    <span className="availability">
+                      Response within 24 hours
+                    </span>
                   </div>
                 </div>
 
@@ -635,11 +751,12 @@ const Contact = () => {
                   <div className="contact-info-content">
                     <h4>Office</h4>
                     <p>Pakistan</p>
+                    <span className="availability">Mon-Fri: 9AM-5PM</span>
                   </div>
                 </div>
 
                 <div className="social-links">
-                  <a href="#" className="social-link">
+                  <a href="#" className="social-link" aria-label="Facebook">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="20"
@@ -654,7 +771,7 @@ const Contact = () => {
                       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                     </svg>
                   </a>
-                  <a href="#" className="social-link">
+                  <a href="#" className="social-link" aria-label="Twitter">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="20"
@@ -669,7 +786,7 @@ const Contact = () => {
                       <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
                     </svg>
                   </a>
-                  <a href="#" className="social-link">
+                  <a href="#" className="social-link" aria-label="Instagram">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="20"
@@ -693,7 +810,7 @@ const Contact = () => {
                       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                     </svg>
                   </a>
-                  <a href="#" className="social-link">
+                  <a href="#" className="social-link" aria-label="LinkedIn">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="20"
@@ -720,23 +837,239 @@ const Contact = () => {
               data-id="contact-form"
               id="contact-form"
             >
+              <div className="form-tabs">
+                <button
+                  className={`form-tab ${
+                    activeTab === "general" ? "active" : ""
+                  }`}
+                  onClick={() => handleTabChange("general")}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  General Inquiry
+                </button>
+                <button
+                  className={`form-tab ${
+                    activeTab === "support" ? "active" : ""
+                  }`}
+                  onClick={() => handleTabChange("support")}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  Support
+                </button>
+                <button
+                  className={`form-tab ${
+                    activeTab === "business" ? "active" : ""
+                  }`}
+                  onClick={() => handleTabChange("business")}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                  </svg>
+                  Business
+                </button>
+              </div>
+
               <form
                 className={`contact-form fade-in ${
                   isVisible["contact-form"] ? "visible" : ""
-                }`}
+                } ${formSuccess ? "success" : ""}`}
                 ref={formRef}
                 onSubmit={SubmitHandler}
               >
                 <div className="form-header">
-                  <h2>Let's Start Growing Your Business Today</h2>
+                  <h2>
+                    {activeTab === "general" &&
+                      "Let's Start Growing Your Business Today"}
+                    {activeTab === "support" && "Need Help? We're Here For You"}
+                    {activeTab === "business" && "Partner With Us For Success"}
+                  </h2>
                   <p>
-                    Contact us today to grow your business with customized
-                    digital marketing solutions and dedicated support.
+                    {activeTab === "general" &&
+                      "Contact us today to grow your business with customized digital marketing solutions and dedicated support."}
+                    {activeTab === "support" &&
+                      "Our support team is ready to assist you with any questions or issues you might have."}
+                    {activeTab === "business" &&
+                      "Explore partnership opportunities and business collaborations with our team."}
                   </p>
                 </div>
 
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="username">
+                      Your Name <span className="required">*</span>
+                    </label>
+                    <div className="input-wrapper">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="input-icon"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        className={formErrors.username ? "error" : ""}
+                        placeholder="Enter your name"
+                      />
+                    </div>
+                    {formErrors.username && (
+                      <span className="error-message">
+                        {formErrors.username}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="email">
+                      Email Address <span className="required">*</span>
+                    </label>
+                    <div className="input-wrapper">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="input-icon"
+                      >
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                      </svg>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={formErrors.email ? "error" : ""}
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                    {formErrors.email && (
+                      <span className="error-message">{formErrors.email}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone Number</label>
+                    <div className="input-wrapper">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="input-icon"
+                      >
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                      </svg>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className={formErrors.phone ? "error" : ""}
+                        placeholder="Enter your phone number (optional)"
+                      />
+                    </div>
+                    {formErrors.phone && (
+                      <span className="error-message">{formErrors.phone}</span>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="company">Company</label>
+                    <div className="input-wrapper">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="input-icon"
+                      >
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                      </svg>
+                      <input
+                        type="text"
+                        id="company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                        placeholder="Enter your company name (optional)"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label htmlFor="username">Your Name</label>
+                  <label htmlFor="subject">
+                    Subject <span className="required">*</span>
+                  </label>
                   <div className="input-wrapper">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -750,59 +1083,30 @@ const Contact = () => {
                       strokeLinejoin="round"
                       className="input-icon"
                     >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
+                      <line x1="4" y1="9" x2="20" y2="9"></line>
+                      <line x1="4" y1="15" x2="20" y2="15"></line>
+                      <line x1="10" y1="3" x2="8" y2="21"></line>
+                      <line x1="16" y1="3" x2="14" y2="21"></line>
                     </svg>
                     <input
                       type="text"
-                      id="username"
-                      name="username"
-                      value={formData.username}
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
                       onChange={handleChange}
-                      className={formErrors.username ? "error" : ""}
-                      placeholder="Enter your name"
+                      className={formErrors.subject ? "error" : ""}
+                      placeholder="Enter message subject"
                     />
                   </div>
-                  {formErrors.username && (
-                    <span className="error-message">{formErrors.username}</span>
+                  {formErrors.subject && (
+                    <span className="error-message">{formErrors.subject}</span>
                   )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="email">Email Address</label>
-                  <div className="input-wrapper">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="input-icon"
-                    >
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                      <polyline points="22,6 12,13 2,6"></polyline>
-                    </svg>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className={formErrors.email ? "error" : ""}
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                  {formErrors.email && (
-                    <span className="error-message">{formErrors.email}</span>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="description">Message</label>
+                  <label htmlFor="description">
+                    Message <span className="required">*</span>
+                  </label>
                   <div className="input-wrapper textarea-wrapper">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -835,51 +1139,108 @@ const Contact = () => {
                   )}
                 </div>
 
-                <button
-                  type="submit"
-                  className="submit-button"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <span className="loading-spinner"></span>
-                  ) : (
-                    <>
-                      <span>Send Message</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
+                <div className="form-footer">
+                  <div className="privacy-note">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect
+                        x="3"
+                        y="11"
                         width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="button-icon"
-                      >
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                      </svg>
-                    </>
-                  )}
-                </button>
+                        height="11"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Your information is secure and encrypted</span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="submit-button"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <span className="loading-spinner"></span>
+                    ) : (
+                      <>
+                        <span>Send Message</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="button-icon"
+                        >
+                          <line x1="22" y1="2" x2="11" y2="13"></line>
+                          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Success Animation Elements */}
+                <div className="success-animation">
+                  <svg
+                    className="checkmark"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 52 52"
+                  >
+                    <circle
+                      className="checkmark-circle"
+                      cx="26"
+                      cy="26"
+                      r="25"
+                      fill="none"
+                    />
+                    <path
+                      className="checkmark-check"
+                      fill="none"
+                      d="M14.1 27.2l7.1 7.2 16.7-16.8"
+                    />
+                  </svg>
+                  <p>Message Sent Successfully!</p>
+                </div>
               </form>
             </div>
           </div>
 
-          {/* Ultra Premium Map Section */}
-          <div className="map-section-container">
-            <div className="map-section-header">
+          {/* Map Section */}
+          <div
+            className="map-section-container animate-section"
+            data-id="map-section"
+          >
+            <div
+              className={`map-section-header fade-in ${
+                isVisible["map-section"] ? "visible" : ""
+              }`}
+            >
               <h2 className="map-section-title">Find Us</h2>
               <p className="map-section-subtitle">
                 Visit our office or contact us online
               </p>
             </div>
 
-            <div className="map-container animate-section" data-id="map">
+            <div className="map-container">
               <div
                 className={`map-wrapper premium-map fade-in ${
-                  isVisible.map ? "visible" : ""
+                  isVisible["map-section"] ? "visible" : ""
                 } ${mapHovered ? "hovered" : ""}`}
                 ref={mapRef}
                 onMouseEnter={() => setMapHovered(true)}
@@ -936,11 +1297,6 @@ const Contact = () => {
                     </div>
                   </div>
                 </div>
-                <div className="map-pin-container">
-                  <div className="map-pin">
-                    <div className="map-pin-pulse"></div>
-                  </div>
-                </div>
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d217762.13795420213!2d74.03746449550566!3d32.16555069383186!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391f29f33e197e89%3A0x53a7ff4c18bc3c36!2sSatellite%20Town%2C%20Gujranwala%2C%20Punjab%2C%20Pakistan!5e0!3m2!1sen!2s!4v1711803600361!5m2!1sen!2s"
                   allowFullScreen="true"
@@ -952,13 +1308,148 @@ const Contact = () => {
             </div>
           </div>
 
+          {/* FAQ Section */}
+          <div className="faq-section animate-section" data-id="faq">
+            <div
+              className={`faq-header fade-in ${isVisible.faq ? "visible" : ""}`}
+            >
+              <h2>Frequently Asked Questions</h2>
+              <p>Find answers to common questions about our services</p>
+            </div>
+
+            <div
+              className={`faq-grid fade-in ${isVisible.faq ? "visible" : ""}`}
+            >
+              <div className="faq-item">
+                <div className="faq-question">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  <h3>What services do you offer?</h3>
+                </div>
+                <div className="faq-answer">
+                  <p>
+                    We offer a comprehensive range of digital marketing services
+                    including SEO, social media marketing, content creation, web
+                    development, and more. Our team tailors solutions to meet
+                    your specific business needs.
+                  </p>
+                </div>
+              </div>
+
+              <div className="faq-item">
+                <div className="faq-question">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  <h3>How quickly can I expect a response?</h3>
+                </div>
+                <div className="faq-answer">
+                  <p>
+                    We typically respond to all inquiries within 24 hours during
+                    business days. For urgent matters, you can reach us directly
+                    by phone for immediate assistance.
+                  </p>
+                </div>
+              </div>
+
+              <div className="faq-item">
+                <div className="faq-question">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  <h3>Do you work with international clients?</h3>
+                </div>
+                <div className="faq-answer">
+                  <p>
+                    Yes, we work with clients globally. Our team is experienced
+                    in handling international projects and can accommodate
+                    different time zones for meetings and communication.
+                  </p>
+                </div>
+              </div>
+
+              <div className="faq-item">
+                <div className="faq-question">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  <h3>What is your pricing structure?</h3>
+                </div>
+                <div className="faq-answer">
+                  <p>
+                    Our pricing varies based on project requirements and scope.
+                    We offer customized quotes after understanding your specific
+                    needs. Contact us for a free consultation and detailed
+                    pricing information.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Contact CTA Section */}
-          <div className="contact-cta-section">
-            <div className="cta-content">
+          <div className="contact-cta-section animate-section" data-id="cta">
+            <div
+              className={`cta-content fade-in ${
+                isVisible.cta ? "visible" : ""
+              }`}
+            >
               <h2>Ready to Grow Your Business?</h2>
               <p>Let's work together to achieve your business goals.</p>
             </div>
-            <a href="#contact-form" className="cta-button">
+            <a
+              href="#contact-form"
+              className={`cta-button fade-in ${isVisible.cta ? "visible" : ""}`}
+            >
               <span>Get Started</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -979,11 +1470,14 @@ const Contact = () => {
         </div>
       </section>
 
-      <ToastContainer position="top-right" autoClose={5000} />
+      <ToastContainer position="bottom-right" autoClose={5000} />
       <Footer />
 
       <style jsx>{`
-        /* Premium Banner - Matching the image design */
+        /* Optimized Contact Page Styling - Mobile Responsive with Reduced Animations */
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+        /* Premium Banner */
         .premium-banner {
           position: relative;
           height: 60vh;
@@ -994,6 +1488,24 @@ const Contact = () => {
           align-items: center;
           justify-content: center;
           background-color: #0a0a0a;
+        }
+
+        .banner-image-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+        }
+
+        .banner-image {
+          width: 100%;
+          height: 100%;
+          background-image: url("https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80");
+          background-size: cover;
+          background-position: center;
+          filter: brightness(0.4) contrast(1.2) saturate(1.1);
         }
 
         .banner-overlay {
@@ -1030,58 +1542,56 @@ const Contact = () => {
           padding: 0 2rem;
         }
 
+        .banner-badge {
+          display: inline-block;
+          padding: 0.5rem 1.5rem;
+          background: rgba(237, 136, 84, 0.1);
+          border: 1px solid rgba(237, 136, 84, 0.3);
+          border-radius: 30px;
+          color: #ed8854;
+          font-size: 0.9rem;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          margin-bottom: 1.5rem;
+          backdrop-filter: blur(10px);
+        }
+
         .banner-title {
-          font-size: 4.5rem;
-          font-weight: 800;
+          font-family: "Playfair Display", serif;
+          font-size: 4rem;
+          font-weight: 700;
           letter-spacing: -1px;
-          margin-bottom: 1rem;
+          margin-bottom: 1.5rem;
           line-height: 1.1;
           color: #ffffff;
           text-transform: capitalize;
         }
 
         .title-underline {
-          width: 100px;
-          height: 4px;
-          background: #8a5cf6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           margin: 1.5rem auto 2rem;
+          gap: 1rem;
+          color: #ed8854;
+        }
+
+        .title-underline span {
+          height: 2px;
+          width: 40px;
+          background: #ed8854;
           border-radius: 2px;
         }
 
         .banner-subtitle {
-          font-size: 1.35rem;
+          font-size: 1.25rem;
           font-weight: 300;
           color: #e2e2e2;
           max-width: 800px;
           margin: 0 auto;
           line-height: 1.6;
         }
-
-        @media (max-width: 768px) {
-          .banner-title {
-            font-size: 3rem;
-          }
-
-          .banner-subtitle {
-            font-size: 1.1rem;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .banner-title {
-            font-size: 2.5rem;
-          }
-
-          .banner-subtitle {
-            font-size: 1rem;
-          }
-
-          .premium-banner {
-            min-height: 350px;
-          }
-        }
-        /* Ultra Premium Contact Page Styling - Optimized for Performance */
-        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 
         /* Main Contact Section */
         #contact-page {
@@ -1093,11 +1603,34 @@ const Contact = () => {
           overflow: hidden;
         }
 
+        #contact-page::before {
+          content: "";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(
+              circle at 15% 50%,
+              rgba(237, 136, 84, 0.05) 0%,
+              transparent 25%
+            ),
+            radial-gradient(
+              circle at 85% 30%,
+              rgba(168, 85, 247, 0.05) 0%,
+              transparent 25%
+            );
+          pointer-events: none;
+          z-index: 0;
+        }
+
         .container {
           width: 100%;
           max-width: 1300px;
           margin: 0 auto;
           padding: 0 2rem;
+          position: relative;
+          z-index: 1;
         }
 
         /* Section Header */
@@ -1149,28 +1682,6 @@ const Contact = () => {
           margin-bottom: 5rem;
         }
 
-        /* Background Elements */
-        #contact-page::before {
-          content: "";
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(
-              circle at 15% 50%,
-              rgba(56, 189, 248, 0.05) 0%,
-              transparent 25%
-            ),
-            radial-gradient(
-              circle at 85% 30%,
-              rgba(168, 85, 247, 0.05) 0%,
-              transparent 25%
-            );
-          pointer-events: none;
-          z-index: 0;
-        }
-
         /* Contact Info Section */
         .contact-info {
           background: #141414;
@@ -1183,12 +1694,6 @@ const Contact = () => {
           position: relative;
           z-index: 1;
           border: 1px solid rgba(255, 255, 255, 0.05);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .contact-info:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
         }
 
         .video-container {
@@ -1202,12 +1707,6 @@ const Contact = () => {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transform: scale(1.05);
-          transition: transform 5s ease;
-        }
-
-        .video-container:hover .contact-video {
-          transform: scale(1.15);
         }
 
         .video-overlay {
@@ -1221,45 +1720,6 @@ const Contact = () => {
             rgba(20, 20, 20, 0.2),
             rgba(20, 20, 20, 0.6)
           );
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .pulse-circle {
-          width: 70px;
-          height: 70px;
-          border-radius: 50%;
-          background: rgba(237, 136, 84, 0.2);
-          position: relative;
-          animation: pulse 2s infinite;
-        }
-
-        .pulse-circle::after {
-          content: "";
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 30px;
-          height: 30px;
-          background: #ed8854;
-          border-radius: 50%;
-        }
-
-        @keyframes pulse {
-          0% {
-            transform: scale(0.8);
-            opacity: 0.8;
-          }
-          70% {
-            transform: scale(1.2);
-            opacity: 0;
-          }
-          100% {
-            transform: scale(0.8);
-            opacity: 0;
-          }
         }
 
         .contact-details {
@@ -1297,15 +1757,7 @@ const Contact = () => {
           padding: 1.5rem;
           background: rgba(255, 255, 255, 0.03);
           border-radius: 12px;
-          transition: all 0.3s ease;
           border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .contact-card:hover {
-          background: rgba(255, 255, 255, 0.05);
-          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-          transform: translateY(-5px);
-          border-color: rgba(237, 136, 84, 0.3);
         }
 
         .contact-icon {
@@ -1317,12 +1769,6 @@ const Contact = () => {
           background: rgba(237, 136, 84, 0.1);
           border-radius: 12px;
           color: #ed8854;
-          transition: all 0.3s ease;
-        }
-
-        .contact-card:hover .contact-icon {
-          background: rgba(237, 136, 84, 0.2);
-          transform: scale(1.1);
         }
 
         .contact-info-content h4 {
@@ -1336,6 +1782,17 @@ const Contact = () => {
           font-size: 1.05rem;
           color: #a1a1aa;
           line-height: 1.5;
+          margin-bottom: 0.5rem;
+        }
+
+        .availability {
+          display: inline-block;
+          font-size: 0.85rem;
+          color: #ed8854;
+          background: rgba(237, 136, 84, 0.1);
+          padding: 0.3rem 0.8rem;
+          border-radius: 20px;
+          margin-top: 0.5rem;
         }
 
         .social-links {
@@ -1353,20 +1810,50 @@ const Contact = () => {
           background: rgba(255, 255, 255, 0.05);
           border-radius: 50%;
           color: #a1a1aa;
-          transition: all 0.3s ease;
           border: 1px solid rgba(255, 255, 255, 0.05);
+          transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .social-link:hover {
           background: #ed8854;
           color: #fff;
-          transform: translateY(-5px) rotate(360deg);
-          box-shadow: 0 10px 20px rgba(237, 136, 84, 0.3);
         }
 
         /* Contact Form Section */
         .contact-form-container {
           position: relative;
+        }
+
+        .form-tabs {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .form-tab {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.8rem 1.5rem;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+          color: #a1a1aa;
+          font-size: 0.95rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .form-tab:hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: #ffffff;
+        }
+
+        .form-tab.active {
+          background: rgba(237, 136, 84, 0.1);
+          border-color: rgba(237, 136, 84, 0.3);
+          color: #ed8854;
         }
 
         .contact-form {
@@ -1376,14 +1863,7 @@ const Contact = () => {
           box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
           position: relative;
           z-index: 1;
-          transition: all 0.3s ease;
           border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .contact-form:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-          border-color: rgba(237, 136, 84, 0.1);
         }
 
         .form-header {
@@ -1404,6 +1884,13 @@ const Contact = () => {
           line-height: 1.6;
         }
 
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
         .form-group {
           margin-bottom: 2rem;
           position: relative;
@@ -1418,6 +1905,11 @@ const Contact = () => {
           text-transform: capitalize;
         }
 
+        .required {
+          color: #ed8854;
+          margin-left: 0.25rem;
+        }
+
         .input-wrapper {
           position: relative;
           display: flex;
@@ -1428,7 +1920,7 @@ const Contact = () => {
           position: absolute;
           left: 1.2rem;
           color: #a1a1aa;
-          transition: all 0.3s ease;
+          transition: color 0.3s ease;
         }
 
         .textarea-icon {
@@ -1444,7 +1936,7 @@ const Contact = () => {
           background: rgba(255, 255, 255, 0.03);
           font-size: 1.05rem;
           color: #e2e8f0;
-          transition: all 0.3s ease;
+          transition: border-color 0.3s ease, background-color 0.3s ease;
         }
 
         .form-group textarea {
@@ -1479,6 +1971,21 @@ const Contact = () => {
           font-weight: 500;
         }
 
+        .form-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 1rem;
+        }
+
+        .privacy-note {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #a1a1aa;
+          font-size: 0.9rem;
+        }
+
         .submit-button {
           display: inline-flex;
           align-items: center;
@@ -1492,7 +1999,7 @@ const Contact = () => {
           font-size: 1.1rem;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: background-color 0.3s ease;
           text-transform: capitalize;
           min-width: 200px;
           position: relative;
@@ -1502,8 +2009,6 @@ const Contact = () => {
 
         .submit-button:hover {
           background: #e67e42;
-          transform: translateY(-5px);
-          box-shadow: 0 15px 30px rgba(237, 136, 84, 0.4);
         }
 
         .button-icon {
@@ -1517,8 +2022,6 @@ const Contact = () => {
         .submit-button:disabled {
           background: rgba(237, 136, 84, 0.5);
           cursor: not-allowed;
-          transform: none;
-          box-shadow: none;
         }
 
         .loading-spinner {
@@ -1537,18 +2040,86 @@ const Contact = () => {
           }
         }
 
-        /* Form Success Animation */
-        .form-success {
-          animation: formSuccess 1.5s ease;
+        /* Success Animation */
+        .contact-form.success .success-animation {
+          opacity: 1;
+          visibility: visible;
         }
 
-        @keyframes formSuccess {
+        .success-animation {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(20, 20, 20, 0.95);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.5s ease;
+          z-index: 10;
+          border-radius: 16px;
+        }
+
+        .success-animation p {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #ffffff;
+          margin-top: 2rem;
+        }
+
+        .checkmark {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          display: block;
+          stroke-width: 2;
+          stroke: #10b981;
+          stroke-miterlimit: 10;
+          box-shadow: inset 0px 0px 0px #10b981;
+          animation: fill 0.4s ease-in-out 0.4s forwards,
+            scale 0.3s ease-in-out 0.9s both;
+        }
+
+        .checkmark-circle {
+          stroke-dasharray: 166;
+          stroke-dashoffset: 166;
+          stroke-width: 2;
+          stroke-miterlimit: 10;
+          stroke: #10b981;
+          fill: none;
+          animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark-check {
+          transform-origin: 50% 50%;
+          stroke-dasharray: 48;
+          stroke-dashoffset: 48;
+          animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+          100% {
+            stroke-dashoffset: 0;
+          }
+        }
+
+        @keyframes scale {
           0%,
           100% {
-            transform: translateY(0);
+            transform: none;
           }
           50% {
-            transform: translateY(-15px);
+            transform: scale3d(1.1, 1.1, 1);
+          }
+        }
+
+        @keyframes fill {
+          100% {
+            box-shadow: inset 0px 0px 0px 30px rgba(16, 185, 129, 0.1);
           }
         }
 
@@ -1583,18 +2154,14 @@ const Contact = () => {
           border-radius: 16px;
           overflow: hidden;
           box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-          height: 600px;
+          height: 500px;
           border: 1px solid rgba(255, 255, 255, 0.05);
           position: relative;
-          transition: all 0.5s ease;
         }
 
         .premium-map {
-          transform: perspective(1000px) rotateX(5deg);
-        }
-
-        .premium-map.hovered {
           transform: perspective(1000px) rotateX(0);
+          transition: transform 0.5s ease;
         }
 
         .map-overlay {
@@ -1610,12 +2177,6 @@ const Contact = () => {
           );
           z-index: 10;
           pointer-events: none;
-          opacity: 1;
-          transition: opacity 0.5s ease;
-        }
-
-        .premium-map.hovered .map-overlay {
-          opacity: 0.5;
         }
 
         .map-card {
@@ -1631,13 +2192,6 @@ const Contact = () => {
           box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
           border: 1px solid rgba(255, 255, 255, 0.1);
           pointer-events: auto;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .map-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-          border-color: rgba(237, 136, 84, 0.2);
         }
 
         .map-card-header {
@@ -1677,84 +2231,89 @@ const Contact = () => {
           color: #ed8854;
           border-radius: 8px;
           font-weight: 600;
-          transition: all 0.3s ease;
+          transition: background-color 0.3s ease;
           text-decoration: none;
         }
 
         .map-directions-button:hover {
           background: rgba(237, 136, 84, 0.2);
-          transform: translateY(-2px);
-        }
-
-        .map-pin-container {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 15;
-          pointer-events: none;
-        }
-
-        .map-pin {
-          width: 30px;
-          height: 30px;
-          background: #ed8854;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          position: relative;
-          animation: bounce 2s infinite;
-        }
-
-        .map-pin::after {
-          content: "";
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 15px;
-          height: 15px;
-          background: rgba(255, 255, 255, 0.8);
-          border-radius: 50%;
-        }
-
-        .map-pin-pulse {
-          position: absolute;
-          width: 50px;
-          height: 50px;
-          background: rgba(237, 136, 84, 0.3);
-          border-radius: 50%;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%) rotate(45deg);
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes bounce {
-          0%,
-          20%,
-          50%,
-          80%,
-          100% {
-            transform: rotate(-45deg) translateY(0);
-          }
-          40% {
-            transform: rotate(-45deg) translateY(-10px);
-          }
-          60% {
-            transform: rotate(-45deg) translateY(-5px);
-          }
         }
 
         .google-map {
           width: 100%;
           height: 100%;
           border: none;
-          filter: grayscale(0.5) contrast(1.2) brightness(0.9) saturate(1.2);
+          filter: grayscale(0.5) contrast(1.2) brightness(0.9);
           transition: filter 0.5s ease;
         }
 
         .premium-map.hovered .google-map {
-          filter: grayscale(0) contrast(1.1) brightness(1) saturate(1.3);
+          filter: grayscale(0) contrast(1.1) brightness(1);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+          margin-bottom: 5rem;
+        }
+
+        .faq-header {
+          text-align: center;
+          margin-bottom: 3rem;
+        }
+
+        .faq-header h2 {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #ffffff;
+          margin-bottom: 1rem;
+        }
+
+        .faq-header p {
+          font-size: 1.2rem;
+          color: #a1a1aa;
+        }
+
+        .faq-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+          gap: 2rem;
+        }
+
+        .faq-item {
+          background: #141414;
+          border-radius: 12px;
+          padding: 2rem;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          transition: border-color 0.3s ease;
+        }
+
+        .faq-item:hover {
+          border-color: rgba(237, 136, 84, 0.2);
+        }
+
+        .faq-question {
+          display: flex;
+          align-items: flex-start;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .faq-question svg {
+          color: #ed8854;
+          flex-shrink: 0;
+          margin-top: 0.25rem;
+        }
+
+        .faq-question h3 {
+          font-size: 1.3rem;
+          font-weight: 600;
+          color: #ffffff;
+        }
+
+        .faq-answer p {
+          color: #a1a1aa;
+          line-height: 1.7;
+          font-size: 1.05rem;
         }
 
         /* Contact CTA Section */
@@ -1812,7 +2371,7 @@ const Contact = () => {
           font-size: 1.1rem;
           font-weight: 600;
           text-decoration: none;
-          transition: all 0.3s ease;
+          transition: background-color 0.3s ease;
           box-shadow: 0 10px 25px rgba(237, 136, 84, 0.3);
           position: relative;
           z-index: 1;
@@ -1820,15 +2379,21 @@ const Contact = () => {
 
         .cta-button:hover {
           background: #e67e42;
-          transform: translateY(-5px);
-          box-shadow: 0 15px 30px rgba(237, 136, 84, 0.4);
         }
 
-        /* Animation Classes */
+        .cta-button svg {
+          transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover svg {
+          transform: translateX(5px);
+        }
+
+        /* Animation Classes - Simplified */
         .fade-in {
           opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
+          transform: translateY(20px);
+          transition: opacity 0.6s ease, transform 0.6s ease;
         }
 
         .fade-in.visible {
@@ -1858,6 +2423,10 @@ const Contact = () => {
           .contact-cta-section {
             padding: 3rem;
           }
+
+          .faq-grid {
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+          }
         }
 
         @media (max-width: 992px) {
@@ -1875,7 +2444,7 @@ const Contact = () => {
           }
 
           .map-wrapper {
-            height: 500px;
+            height: 450px;
           }
 
           .banner-title {
@@ -1886,6 +2455,15 @@ const Contact = () => {
             font-size: 1.2rem;
           }
 
+          .banner-badge {
+            font-size: 0.85rem;
+          }
+
+          .premium-banner {
+            height: 60vh;
+            min-height: 450px;
+          }
+
           .contact-cta-section {
             flex-direction: column;
             text-align: center;
@@ -1894,6 +2472,11 @@ const Contact = () => {
 
           .cta-content {
             max-width: 100%;
+          }
+
+          .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
           }
         }
 
@@ -1918,9 +2501,9 @@ const Contact = () => {
             font-size: 1rem;
           }
 
-          .ultra-premium-banner {
-            height: 70vh;
-            min-height: 450px;
+          .premium-banner {
+            height: 50vh;
+            min-height: 400px;
           }
 
           .video-container {
@@ -1949,6 +2532,22 @@ const Contact = () => {
           .section-title {
             font-size: 2rem;
           }
+
+          .faq-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .form-tabs {
+            flex-wrap: wrap;
+          }
+
+          .form-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.7rem 1rem;
+            font-size: 0.85rem;
+            justify-content: center;
+          }
         }
 
         @media (max-width: 576px) {
@@ -1973,8 +2572,8 @@ const Contact = () => {
             padding: 0.4rem 1.2rem;
           }
 
-          .ultra-premium-banner {
-            min-height: 400px;
+          .premium-banner {
+            min-height: 350px;
           }
 
           .map-wrapper {
@@ -2008,6 +2607,15 @@ const Contact = () => {
 
           .cta-content h2 {
             font-size: 1.8rem;
+          }
+
+          .form-footer {
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+
+          .privacy-note {
+            order: 2;
           }
         }
 
@@ -2066,26 +2674,13 @@ const Contact = () => {
           .contact-card {
             padding: 1.2rem;
           }
-        }
 
-        /* Touch Device Optimizations */
-        @media (hover: none) {
-          .contact-card:hover {
-            transform: none;
+          .faq-item {
+            padding: 1.5rem;
           }
 
-          .social-link:hover {
-            transform: none;
-          }
-
-          .submit-button:hover {
-            transform: none;
-          }
-
-          .contact-form:hover,
-          .contact-info:hover,
-          .map-card:hover {
-            transform: none;
+          .faq-question h3 {
+            font-size: 1.1rem;
           }
         }
       `}</style>

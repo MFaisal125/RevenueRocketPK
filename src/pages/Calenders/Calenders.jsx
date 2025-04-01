@@ -467,12 +467,11 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../../assets/css/media-query.css";
 import supportImg from "../../assets/image/12084798_20943953.jpg";
 import "react-calendar/dist/Calendar.css";
 import Header from "../../Common/Header/Headers";
-import Banner from "../../Common/Banners/Banner";
 import schedule from "../../assets/video/schedule.mp4";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -492,6 +491,23 @@ const Calenders = () => {
   const [activeView, setActiveView] = useState("personal");
   const [formErrors, setFormErrors] = useState({});
   const [animateIn, setAnimateIn] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [selectedPlatform, setSelectedPlatform] = useState("");
+  const [formSuccess, setFormSuccess] = useState(false);
+
+  const bannerRef = useRef(null);
+  const videoRef = useRef(null);
+  const formRef = useRef(null);
+
+  // Handle scroll for parallax effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     // Add animation class after component mounts
@@ -500,8 +516,63 @@ const Calenders = () => {
     }, 100);
   }, []);
 
+  // Video play/pause based on visibility
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.3,
+    };
+
+    const handleVideoIntersect = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && videoRef.current) {
+          videoRef.current.play();
+        } else if (videoRef.current) {
+          videoRef.current.pause();
+        }
+      });
+    };
+
+    const videoObserver = new IntersectionObserver(
+      handleVideoIntersect,
+      options
+    );
+
+    if (videoRef.current) {
+      videoObserver.observe(videoRef.current);
+    }
+
+    return () => {
+      if (videoRef.current) {
+        videoObserver.unobserve(videoRef.current);
+      }
+    };
+  }, [videoRef.current]);
+
   function alert_message(message, type = "info") {
-    toast(message, { type });
+    toast(message, {
+      type,
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      style: {
+        background:
+          type === "success"
+            ? "#10b981"
+            : type === "error"
+            ? "#ef4444"
+            : "#3b82f6",
+        color: "#fff",
+        borderRadius: "10px",
+        boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
+      },
+    });
   }
 
   const validateForm = (view) => {
@@ -571,7 +642,8 @@ const Calenders = () => {
       email: email,
       service_type: service_type,
       description: description !== "" ? description : "empty description",
-      provider: provider !== "" ? provider : "empty provider",
+      provider:
+        provider !== "" ? provider : selectedPlatform || "empty provider",
       status: 1,
     };
 
@@ -586,8 +658,6 @@ const Calenders = () => {
 
       const result = await response.json();
 
-      alert_message("Please check your email for our response!", "success");
-
       var templateParams = {
         to_name: "username: " + username,
         subject: service_type,
@@ -601,14 +671,27 @@ const Calenders = () => {
       emailjs.init("lMgYQoX_cHOnwd6_K");
       await emailjs.send("service_ryvfsfd", "template_drmpp6x", templateParams);
 
-      // Reset form
-      setUsername("");
-      setEmail("");
-      setStartDate("");
-      setProvider("");
-      setServiceType("");
-      setDescription("");
-      setActiveView("personal");
+      // Show success state
+      setFormSuccess(true);
+
+      // Show success message
+      alert_message(
+        "Your consultation has been scheduled successfully! Please check your email for confirmation.",
+        "success"
+      );
+
+      // Reset form after delay
+      setTimeout(() => {
+        setUsername("");
+        setEmail("");
+        setStartDate("");
+        setProvider("");
+        setServiceType("");
+        setDescription("");
+        setSelectedPlatform("");
+        setActiveView("personal");
+        setFormSuccess(false);
+      }, 3000);
     } catch (error) {
       console.error(error);
       alert_message("Something went wrong. Please try again.", "error");
@@ -630,6 +713,10 @@ const Calenders = () => {
     if (formErrors.start_date) {
       setFormErrors({ ...formErrors, start_date: "" });
     }
+  };
+
+  const handlePlatformSelect = (platform) => {
+    setSelectedPlatform(platform);
   };
 
   const renderProgressBar = () => {
@@ -730,7 +817,38 @@ const Calenders = () => {
             />
           </div>
           {formErrors.username && (
-            <div className="error-message">{formErrors.username}</div>
+            <div className="error-message">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+              >
+                <path
+                  d="M12 9V14"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 17.5V17.51"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>{formErrors.username}</span>
+            </div>
           )}
         </div>
 
@@ -777,8 +895,75 @@ const Calenders = () => {
             />
           </div>
           {formErrors.email && (
-            <div className="error-message">{formErrors.email}</div>
+            <div className="error-message">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+              >
+                <path
+                  d="M12 9V14"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 17.5V17.51"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>{formErrors.email}</span>
+            </div>
           )}
+        </div>
+
+        <div className="form-info-box">
+          <div className="info-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 16V12"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 8H12.01"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <p>
+            Your information is secure and will only be used to schedule your
+            consultation.
+          </p>
         </div>
 
         <div className="form-actions">
@@ -859,7 +1044,38 @@ const Calenders = () => {
             />
           </div>
           {formErrors.start_date && (
-            <div className="error-message">{formErrors.start_date}</div>
+            <div className="error-message">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+              >
+                <path
+                  d="M12 9V14"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 17.5V17.51"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>{formErrors.start_date}</span>
+            </div>
           )}
           <button className="date-picker-button" onClick={modalShow}>
             <svg
@@ -954,7 +1170,38 @@ const Calenders = () => {
             </select>
           </div>
           {formErrors.service_type && (
-            <div className="error-message">{formErrors.service_type}</div>
+            <div className="error-message">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+              >
+                <path
+                  d="M12 9V14"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 17.5V17.51"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>{formErrors.service_type}</span>
+            </div>
           )}
         </div>
 
@@ -963,45 +1210,80 @@ const Calenders = () => {
             <span className="label-text">Meeting Platform</span>
           </label>
           <div className="platform-options">
-            <div className="platform-option" title="Zoom">
+            <div
+              className={`platform-option ${
+                selectedPlatform === "Zoom" ? "active" : ""
+              }`}
+              title="Zoom"
+              onClick={() => handlePlatformSelect("Zoom")}
+            >
               <img
                 width="24"
                 height="24"
                 src="https://img.icons8.com/color/48/zoom.png"
                 alt="zoom"
               />
+              <span className="platform-name">Zoom</span>
             </div>
-            <div className="platform-option" title="Microsoft Teams">
+            <div
+              className={`platform-option ${
+                selectedPlatform === "Microsoft Teams" ? "active" : ""
+              }`}
+              title="Microsoft Teams"
+              onClick={() => handlePlatformSelect("Microsoft Teams")}
+            >
               <img
                 width="24"
                 height="24"
                 src="https://img.icons8.com/color-glass/48/microsoft-teams.png"
                 alt="microsoft-teams"
               />
+              <span className="platform-name">Teams</span>
             </div>
-            <div className="platform-option" title="Google Meet">
+            <div
+              className={`platform-option ${
+                selectedPlatform === "Google Meet" ? "active" : ""
+              }`}
+              title="Google Meet"
+              onClick={() => handlePlatformSelect("Google Meet")}
+            >
               <img
                 width="24"
                 height="24"
                 src="https://img.icons8.com/color/48/google-meet--v1.png"
                 alt="google-meet"
               />
+              <span className="platform-name">Meet</span>
             </div>
-            <div className="platform-option" title="Skype">
+            <div
+              className={`platform-option ${
+                selectedPlatform === "Skype" ? "active" : ""
+              }`}
+              title="Skype"
+              onClick={() => handlePlatformSelect("Skype")}
+            >
               <img
                 width="24"
                 height="24"
                 src="https://img.icons8.com/color/48/skype--v1.png"
                 alt="skype"
               />
+              <span className="platform-name">Skype</span>
             </div>
-            <div className="platform-option" title="Cisco Webex">
+            <div
+              className={`platform-option ${
+                selectedPlatform === "Cisco Webex" ? "active" : ""
+              }`}
+              title="Cisco Webex"
+              onClick={() => handlePlatformSelect("Cisco Webex")}
+            >
               <img
                 width="24"
                 height="24"
                 src="https://img.icons8.com/color/48/cisco-webex-meetings.png"
                 alt="cisco-webex"
               />
+              <span className="platform-name">Webex</span>
             </div>
           </div>
           <div className="input-container">
@@ -1163,10 +1445,10 @@ const Calenders = () => {
             <div className="review-label">Service:</div>
             <div className="review-value">{service_type}</div>
           </div>
-          {provider && (
+          {(selectedPlatform || provider) && (
             <div className="review-item">
-              <div className="review-label">Meeting Link:</div>
-              <div className="review-value">{provider}</div>
+              <div className="review-label">Meeting Platform:</div>
+              <div className="review-value">{selectedPlatform || provider}</div>
             </div>
           )}
           {description && (
@@ -1233,12 +1515,56 @@ const Calenders = () => {
   return (
     <>
       <ToastContainer
-        position="top-right"
+        position="bottom-right"
         autoClose={5000}
         hideProgressBar={false}
       />
       <Header tags={location.href} />
-      <Banner Img={supportImg} title="Get Free Consultation" />
+
+      {/* Premium Banner - Similar to About.jsx */}
+      <div className="premium-banner" ref={bannerRef}>
+        <div className="banner-image-container">
+          <img
+            src={supportImg || "/placeholder.svg"}
+            alt="Consultation"
+            className="banner-image"
+            style={{ transform: `translateY(${scrollY * 0.2}px)` }}
+          />
+        </div>
+        <div className="banner-overlay"></div>
+        {/* <div className="hexagon-pattern"></div> */}
+        <div className="banner-content">
+          <div className="banner-badge">Expert Consultation</div>
+          <h1 className="banner-title">Schedule a Meeting</h1>
+          <div className="title-underline">
+            <span></span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span></span>
+          </div>
+          <p className="banner-subtitle">
+            Book a free consultation with our experts to discuss your project
+            needs and get personalized solutions
+          </p>
+        </div>
+        {/* <div className="scroll-indicator">
+          <div className="scroll-text">Scroll Down</div>
+          <div className="scroll-icon"></div>
+        </div> */}
+      </div>
 
       {/* Date & Time Modal */}
       <div className={`datetime-modal ${showModal ? "show" : ""}`}>
@@ -1295,10 +1621,14 @@ const Calenders = () => {
       <section id="premium-calendar">
         <div className="container">
           <div className="section-header">
+            <span className="section-subtitle">
+              Book Your Free Consultation
+            </span>
             <h2 className="section-title">Schedule Your Free Consultation</h2>
-            <p className="section-subtitle">
-              Book a time with our experts to discuss your project needs and get
-              personalized solutions
+            <p className="section-description">
+              Take the first step towards transforming your business with our
+              expert consultation. Our team is ready to understand your needs
+              and provide tailored solutions.
             </p>
           </div>
 
@@ -1306,12 +1636,14 @@ const Calenders = () => {
             <div className="calendar-content">
               <div className="video-container">
                 <video
+                  ref={videoRef}
                   title="Free Consulting"
                   poster={scheduleVideo_banner}
                   autoPlay
                   muted
                   loop
                   className="consultation-video"
+                  playsInline
                 >
                   <source src={schedule} type="video/mp4" />
                 </video>
@@ -1425,12 +1757,41 @@ const Calenders = () => {
                 </div>
               </div>
 
-              <div className="form-container">
+              <div className="form-container" ref={formRef}>
                 {renderProgressBar()}
-                <div className="form-wrapper">
+                <div className={`form-wrapper ${formSuccess ? "success" : ""}`}>
                   {activeView === "personal" && renderPersonalInfoView()}
                   {activeView === "meeting" && renderMeetingDetailsView()}
                   {activeView === "review" && renderReviewView()}
+
+                  {/* Success Animation */}
+                  <div className="success-animation">
+                    <div className="success-icon">
+                      <svg
+                        className="checkmark"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 52 52"
+                      >
+                        <circle
+                          className="checkmark-circle"
+                          cx="26"
+                          cy="26"
+                          r="25"
+                          fill="none"
+                        />
+                        <path
+                          className="checkmark-check"
+                          fill="none"
+                          d="M14.1 27.2l7.1 7.2 16.7-16.8"
+                        />
+                      </svg>
+                    </div>
+                    <h3>Consultation Scheduled!</h3>
+                    <p>
+                      Your meeting has been booked successfully. Check your
+                      email for confirmation details.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1441,16 +1802,194 @@ const Calenders = () => {
       <Footer />
 
       <style jsx>{`
-        /* Ultra Premium Modern UX/UI Design - 8500 Style */
-        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
+        /* Ultra Premium 10000-Level Design - Fully Responsive */
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+        /* Premium Banner - Similar to About.jsx */
+        .premium-banner {
+          position: relative;
+          height: 70vh;
+          min-height: 500px;
+          width: 100%;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #0a0a0a;
+        }
+
+        .banner-image-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+        }
+
+        .banner-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          filter: brightness(0.4) contrast(1.2) saturate(1.1);
+          transform-origin: center;
+          transition: transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        .banner-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0.9),
+            rgba(0, 0, 0, 0.7)
+          );
+          z-index: 2;
+        }
+
+        .hexagon-pattern {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%23ffffff" fillOpacity="0.05" d="M50 0L93.3 25v50L50 100L6.7 75V25L50 0z"/></svg>');
+          background-size: 150px 150px;
+          z-index: 3;
+          opacity: 0.3;
+        }
+
+        .banner-content {
+          position: relative;
+          z-index: 4;
+          text-align: center;
+          max-width: 900px;
+          padding: 0 2rem;
+        }
+
+        .banner-badge {
+          display: inline-block;
+          padding: 0.5rem 1.5rem;
+          background: rgba(237, 136, 84, 0.1);
+          border: 1px solid rgba(237, 136, 84, 0.3);
+          border-radius: 30px;
+          color: #ed8854;
+          font-size: 0.9rem;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          margin-bottom: 1.5rem;
+          backdrop-filter: blur(10px);
+        }
+
+        .banner-title {
+          font-family: "Playfair Display", serif;
+          font-size: 4.5rem;
+          font-weight: 700;
+          letter-spacing: -1px;
+          margin-bottom: 1.5rem;
+          line-height: 1.1;
+          color: #ffffff;
+          text-transform: capitalize;
+        }
+
+        .title-underline {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 1.5rem auto 2rem;
+          gap: 1rem;
+          color: #ed8854;
+        }
+
+        .title-underline span {
+          height: 2px;
+          width: 40px;
+          background: #ed8854;
+          border-radius: 2px;
+        }
+
+        .banner-subtitle {
+          font-size: 1.25rem;
+          font-weight: 300;
+          color: #e2e2e2;
+          max-width: 800px;
+          margin: 0 auto;
+          line-height: 1.6;
+        }
+
+        .scroll-indicator {
+          position: absolute;
+          bottom: 40px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          opacity: 0;
+          animation: fadeIn 1s ease forwards;
+          animation-delay: 1.5s;
+        }
+
+        @keyframes fadeIn {
+          to {
+            opacity: 1;
+          }
+        }
+
+        .scroll-text {
+          font-size: 0.8rem;
+          font-weight: 500;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #d4d4d8;
+          margin-bottom: 0.5rem;
+        }
+
+        .scroll-icon {
+          width: 30px;
+          height: 50px;
+          border: 2px solid rgba(212, 212, 216, 0.3);
+          border-radius: 15px;
+          position: relative;
+        }
+
+        .scroll-icon::before {
+          content: "";
+          position: absolute;
+          top: 8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 6px;
+          height: 6px;
+          background-color: #d4d4d8;
+          border-radius: 50%;
+          animation: scrollDown 2s infinite;
+        }
+
+        @keyframes scrollDown {
+          0% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+          }
+        }
 
         /* Main Calendar Section */
         #premium-calendar {
           font-family: "Plus Jakarta Sans", sans-serif;
-          padding: 5rem 0;
-          background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+          padding: 6rem 0;
+          background: #0a0a0a;
           position: relative;
           overflow: hidden;
+          color: #e2e8f0;
         }
 
         #premium-calendar::before {
@@ -1460,71 +1999,88 @@ const Calenders = () => {
           left: 0;
           width: 100%;
           height: 100%;
-          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23000000' fillOpacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-          opacity: 0.5;
+          background: radial-gradient(
+              circle at 15% 50%,
+              rgba(237, 136, 84, 0.05) 0%,
+              transparent 25%
+            ),
+            radial-gradient(
+              circle at 85% 30%,
+              rgba(168, 85, 247, 0.05) 0%,
+              transparent 25%
+            );
+          pointer-events: none;
+          z-index: 0;
         }
 
         .container {
-          max-width: 1200px;
+          max-width: 1300px;
           margin: 0 auto;
-          padding: 0 1.5rem;
+          padding: 0 2rem;
           position: relative;
           z-index: 1;
         }
 
         .section-header {
           text-align: center;
-          margin-bottom: 3rem;
+          margin-bottom: 4rem;
+        }
+
+        .section-subtitle {
+          display: inline-block;
+          font-size: 1rem;
+          font-weight: 500;
+          color: #ed8854;
+          margin-bottom: 1rem;
+          text-transform: uppercase;
+          letter-spacing: 2px;
         }
 
         .section-title {
-          font-size: 2.5rem;
-          font-weight: 800;
-          color: #1a1a1a;
-          margin-bottom: 1rem;
+          font-size: 3rem;
+          font-weight: 700;
+          color: #ffffff;
+          margin-bottom: 1.5rem;
           position: relative;
           display: inline-block;
-          background: linear-gradient(90deg, #ed8550, #f2994a);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
         }
 
         .section-title::after {
           content: "";
           position: absolute;
-          bottom: -10px;
+          bottom: -15px;
           left: 50%;
           transform: translateX(-50%);
           width: 80px;
-          height: 4px;
-          background: linear-gradient(to right, #ed8550, #f2994a);
+          height: 3px;
+          background: linear-gradient(to right, #ed8854, #f2994a);
           border-radius: 2px;
         }
 
-        .section-subtitle {
+        .section-description {
           font-size: 1.1rem;
-          color: #666;
+          color: #a1a1aa;
           max-width: 700px;
-          margin: 1.5rem auto 0;
+          margin: 2rem auto 0;
           line-height: 1.6;
         }
 
         /* Calendar Container */
         .calendar-container {
-          background: #fff;
+          background: #141414;
           border-radius: 20px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
           overflow: hidden;
           transform: translateY(0);
           opacity: 1;
           transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .calendar-content {
           display: grid;
           grid-template-columns: 1fr 1.5fr;
-          min-height: 600px;
+          min-height: 650px;
         }
 
         /* Video Container */
@@ -1577,7 +2133,7 @@ const Calenders = () => {
           left: 0;
           width: 60px;
           height: 3px;
-          background: #ed8550;
+          background: #ed8854;
           border-radius: 3px;
         }
 
@@ -1609,7 +2165,7 @@ const Calenders = () => {
         .benefit-icon svg {
           width: 16px;
           height: 16px;
-          color: #ed8550;
+          color: #ed8854;
         }
 
         /* Form Container */
@@ -1617,6 +2173,7 @@ const Calenders = () => {
           padding: 2.5rem;
           display: flex;
           flex-direction: column;
+          position: relative;
         }
 
         /* Progress Bar */
@@ -1631,6 +2188,17 @@ const Calenders = () => {
           position: relative;
         }
 
+        .progress-steps::before {
+          content: "";
+          position: absolute;
+          top: 18px;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: rgba(255, 255, 255, 0.1);
+          z-index: 1;
+        }
+
         .progress-step {
           display: flex;
           flex-direction: column;
@@ -1643,8 +2211,8 @@ const Calenders = () => {
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background: #f1f3f5;
-          border: 2px solid #ddd;
+          background: #1a1a1a;
+          border: 2px solid rgba(255, 255, 255, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1662,20 +2230,20 @@ const Calenders = () => {
         }
 
         .progress-step.active .step-number {
-          background: #ed8550;
-          border-color: #ed8550;
+          background: #ed8854;
+          border-color: #ed8854;
           color: #fff;
           box-shadow: 0 5px 15px rgba(237, 133, 80, 0.3);
         }
 
         .progress-step.active .step-label {
-          color: #ed8550;
+          color: #ed8854;
           font-weight: 600;
         }
 
         .progress-bar {
           height: 4px;
-          background: #eee;
+          background: rgba(255, 255, 255, 0.1);
           border-radius: 2px;
           overflow: hidden;
           margin-top: 0.5rem;
@@ -1683,7 +2251,7 @@ const Calenders = () => {
 
         .progress-fill {
           height: 100%;
-          background: linear-gradient(to right, #ed8550, #f2994a);
+          background: linear-gradient(to right, #ed8854, #f2994a);
           border-radius: 2px;
           transition: width 0.5s ease;
         }
@@ -1695,6 +2263,17 @@ const Calenders = () => {
           flex-direction: column;
           position: relative;
           overflow: hidden;
+        }
+
+        .form-wrapper.success .form-view {
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .form-wrapper.success .success-animation {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: auto;
         }
 
         .form-view {
@@ -1726,7 +2305,7 @@ const Calenders = () => {
           align-items: center;
           margin-bottom: 0.5rem;
           font-weight: 500;
-          color: #333;
+          color: #e2e8f0;
         }
 
         .label-text {
@@ -1750,7 +2329,7 @@ const Calenders = () => {
           left: 1rem;
           width: 20px;
           height: 20px;
-          color: #aaa;
+          color: #a1a1aa;
           transition: all 0.3s ease;
         }
 
@@ -1761,24 +2340,24 @@ const Calenders = () => {
         .form-input {
           width: 100%;
           padding: 0.75rem 1rem 0.75rem 2.5rem;
-          border: 1px solid #ddd;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
           font-size: 1rem;
-          color: #333;
+          color: #e2e8f0;
           transition: all 0.3s ease;
-          background: #f9f9f9;
+          background: rgba(255, 255, 255, 0.05);
           font-family: "Plus Jakarta Sans", sans-serif;
         }
 
         .form-input:focus {
-          border-color: #ed8550;
+          border-color: #ed8854;
           box-shadow: 0 0 0 3px rgba(237, 133, 80, 0.2);
           outline: none;
-          background: #fff;
+          background: rgba(255, 255, 255, 0.08);
         }
 
         .form-input:focus + .input-icon {
-          color: #ed8550;
+          color: #ed8854;
         }
 
         .form-input.error {
@@ -1796,12 +2375,37 @@ const Calenders = () => {
           margin-top: 0.5rem;
           display: flex;
           align-items: center;
+          gap: 0.5rem;
         }
 
         textarea.form-input {
           min-height: 120px;
           resize: vertical;
           padding-top: 1rem;
+        }
+
+        /* Form Info Box */
+        .form-info-box {
+          display: flex;
+          align-items: flex-start;
+          gap: 1rem;
+          padding: 1rem;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          margin-bottom: 1.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-icon {
+          color: #38bdf8;
+          flex-shrink: 0;
+        }
+
+        .form-info-box p {
+          font-size: 0.9rem;
+          color: #a1a1aa;
+          margin: 0;
+          line-height: 1.5;
         }
 
         /* Date Picker Button */
@@ -1813,17 +2417,19 @@ const Calenders = () => {
           width: 100%;
           padding: 0.75rem;
           margin-top: 0.5rem;
-          background: #f0f0f0;
-          border: none;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
-          color: #555;
+          color: #a1a1aa;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.3s ease;
         }
 
         .date-picker-button:hover {
-          background: #e0e0e0;
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(237, 133, 80, 0.3);
+          color: #e2e8f0;
         }
 
         .date-picker-button svg {
@@ -1835,25 +2441,45 @@ const Calenders = () => {
         .platform-options {
           display: flex;
           flex-wrap: wrap;
-          gap: 0.5rem;
+          gap: 0.75rem;
           margin-bottom: 1rem;
         }
 
         .platform-option {
-          width: 40px;
-          height: 40px;
-          border-radius: 8px;
-          background: #f0f0f0;
           display: flex;
+          flex-direction: column;
           align-items: center;
-          justify-content: center;
+          gap: 0.5rem;
+          width: 70px;
+          height: 70px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 0.75rem;
           transition: all 0.3s ease;
           cursor: pointer;
         }
 
         .platform-option:hover {
-          background: #e0e0e0;
+          background: rgba(255, 255, 255, 0.08);
           transform: translateY(-2px);
+          border-color: rgba(237, 133, 80, 0.3);
+        }
+
+        .platform-option.active {
+          background: rgba(237, 133, 80, 0.1);
+          border-color: rgba(237, 133, 80, 0.5);
+          box-shadow: 0 5px 15px rgba(237, 133, 80, 0.2);
+        }
+
+        .platform-name {
+          font-size: 0.75rem;
+          color: #a1a1aa;
+          text-align: center;
+        }
+
+        .platform-option.active .platform-name {
+          color: #ed8854;
         }
 
         /* Form Actions */
@@ -1880,16 +2506,18 @@ const Calenders = () => {
         }
 
         .back-button {
-          background: #f0f0f0;
-          color: #555;
+          background: rgba(255, 255, 255, 0.05);
+          color: #a1a1aa;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .back-button:hover {
-          background: #e0e0e0;
+          background: rgba(255, 255, 255, 0.08);
+          color: #e2e8f0;
         }
 
         .next-button {
-          background: #ed8550;
+          background: #ed8854;
           color: #fff;
         }
 
@@ -1900,14 +2528,14 @@ const Calenders = () => {
         }
 
         .submit-button {
-          background: #4caf50;
+          background: #10b981;
           color: #fff;
         }
 
         .submit-button:hover {
-          background: #43a047;
+          background: #0d9668;
           transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+          box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
         }
 
         .back-button svg,
@@ -1927,7 +2555,7 @@ const Calenders = () => {
           width: 60px;
           height: 60px;
           margin: 0 auto 1rem;
-          background: rgba(76, 175, 80, 0.1);
+          background: rgba(16, 185, 129, 0.1);
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -1937,31 +2565,32 @@ const Calenders = () => {
         .review-icon svg {
           width: 30px;
           height: 30px;
-          color: #4caf50;
+          color: #10b981;
         }
 
         .review-header h3 {
           font-size: 1.5rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
-          color: #333;
+          color: #e2e8f0;
         }
 
         .review-header p {
-          color: #666;
+          color: #a1a1aa;
         }
 
         .review-details {
-          background: #f9f9f9;
+          background: rgba(255, 255, 255, 0.05);
           border-radius: 12px;
           padding: 1.5rem;
           margin-bottom: 2rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .review-item {
           display: flex;
           margin-bottom: 1rem;
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
           padding-bottom: 1rem;
         }
 
@@ -1973,18 +2602,109 @@ const Calenders = () => {
 
         .review-label {
           font-weight: 600;
-          color: #555;
+          color: #a1a1aa;
           width: 120px;
           flex-shrink: 0;
         }
 
         .review-value {
-          color: #333;
+          color: #e2e8f0;
           flex: 1;
         }
 
         .description-value {
           white-space: pre-wrap;
+        }
+
+        /* Success Animation */
+        .success-animation {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: rgba(20, 20, 20, 0.95);
+          z-index: 10;
+          padding: 2rem;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          pointer-events: none;
+          border-radius: 12px;
+        }
+
+        .success-icon {
+          margin-bottom: 2rem;
+        }
+
+        .success-animation h3 {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: #e2e8f0;
+          margin-bottom: 1rem;
+        }
+
+        .success-animation p {
+          font-size: 1.1rem;
+          color: #a1a1aa;
+          text-align: center;
+          max-width: 400px;
+        }
+
+        .checkmark {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          display: block;
+          stroke-width: 2;
+          stroke: #10b981;
+          stroke-miterlimit: 10;
+          box-shadow: inset 0px 0px 0px #10b981;
+          animation: fill 0.4s ease-in-out 0.4s forwards,
+            scale 0.3s ease-in-out 0.9s both;
+        }
+
+        .checkmark-circle {
+          stroke-dasharray: 166;
+          stroke-dashoffset: 166;
+          stroke-width: 2;
+          stroke-miterlimit: 10;
+          stroke: #10b981;
+          fill: none;
+          animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark-check {
+          transform-origin: 50% 50%;
+          stroke-dasharray: 48;
+          stroke-dashoffset: 48;
+          animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+          100% {
+            stroke-dashoffset: 0;
+          }
+        }
+
+        @keyframes scale {
+          0%,
+          100% {
+            transform: none;
+          }
+          50% {
+            transform: scale3d(1.1, 1.1, 1);
+          }
+        }
+
+        @keyframes fill {
+          100% {
+            box-shadow: inset 0px 0px 0px 30px rgba(16, 185, 129, 0.1);
+          }
         }
 
         /* Loading Spinner */
@@ -2011,7 +2731,7 @@ const Calenders = () => {
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0, 0, 0, 0.8);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -2019,6 +2739,7 @@ const Calenders = () => {
           opacity: 0;
           visibility: hidden;
           transition: all 0.3s ease;
+          backdrop-filter: blur(5px);
         }
 
         .datetime-modal.show {
@@ -2027,13 +2748,15 @@ const Calenders = () => {
         }
 
         .datetime-modal-content {
-          background: #fff;
-          border-radius: 12px;
+          background: #1a1a1a;
+          border-radius: 16px;
           width: 90%;
           max-width: 500px;
-          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
           transform: translateY(20px);
           transition: all 0.3s ease;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          overflow: hidden;
         }
 
         .datetime-modal.show .datetime-modal-content {
@@ -2045,13 +2768,13 @@ const Calenders = () => {
           align-items: center;
           justify-content: space-between;
           padding: 1.5rem;
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .datetime-modal-header h3 {
           font-size: 1.2rem;
           font-weight: 600;
-          color: #333;
+          color: #e2e8f0;
           margin: 0;
         }
 
@@ -2059,7 +2782,7 @@ const Calenders = () => {
           background: none;
           border: none;
           cursor: pointer;
-          color: #888;
+          color: #a1a1aa;
           transition: all 0.3s ease;
           display: flex;
           align-items: center;
@@ -2067,7 +2790,7 @@ const Calenders = () => {
         }
 
         .close-button:hover {
-          color: #333;
+          color: #e2e8f0;
         }
 
         .close-button svg {
@@ -2087,10 +2810,11 @@ const Calenders = () => {
         .datetime-picker {
           width: 100%;
           padding: 1rem;
-          border: 1px solid #ddd;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
           font-size: 1rem;
-          color: #333;
+          color: #e2e8f0;
+          background: rgba(255, 255, 255, 0.05);
         }
 
         .datetime-modal-footer {
@@ -2098,7 +2822,7 @@ const Calenders = () => {
           justify-content: flex-end;
           gap: 1rem;
           padding: 1.5rem;
-          border-top: 1px solid #eee;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .modal-cancel-btn,
@@ -2112,16 +2836,18 @@ const Calenders = () => {
         }
 
         .modal-cancel-btn {
-          background: #f0f0f0;
-          color: #555;
+          background: rgba(255, 255, 255, 0.05);
+          color: #a1a1aa;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .modal-cancel-btn:hover {
-          background: #e0e0e0;
+          background: rgba(255, 255, 255, 0.08);
+          color: #e2e8f0;
         }
 
         .modal-confirm-btn {
-          background: #ed8550;
+          background: #ed8854;
           color: #fff;
         }
 
@@ -2130,30 +2856,53 @@ const Calenders = () => {
         }
 
         /* Responsive Design */
+        @media (max-width: 1200px) {
+          .banner-title {
+            font-size: 3.5rem;
+          }
+
+          .section-title {
+            font-size: 2.5rem;
+          }
+        }
+
         @media (max-width: 992px) {
           .calendar-content {
             grid-template-columns: 1fr;
           }
 
           .video-container {
-            height: 300px;
+            height: 350px;
           }
 
           .form-container {
             padding: 2rem;
           }
+
+          .banner-title {
+            font-size: 3rem;
+          }
+
+          .banner-subtitle {
+            font-size: 1.1rem;
+          }
+
+          .premium-banner {
+            height: 60vh;
+            min-height: 450px;
+          }
         }
 
         @media (max-width: 768px) {
           #premium-calendar {
-            padding: 3rem 0;
+            padding: 4rem 0;
           }
 
           .section-title {
             font-size: 2rem;
           }
 
-          .section-subtitle {
+          .section-description {
             font-size: 1rem;
           }
 
@@ -2180,9 +2929,30 @@ const Calenders = () => {
             width: 100%;
             margin-bottom: 0.25rem;
           }
+
+          .banner-title {
+            font-size: 2.5rem;
+          }
+
+          .banner-subtitle {
+            font-size: 1rem;
+          }
+
+          .premium-banner {
+            height: 50vh;
+            min-height: 400px;
+          }
+
+          .platform-options {
+            justify-content: center;
+          }
         }
 
         @media (max-width: 576px) {
+          .container {
+            padding: 0 1.5rem;
+          }
+
           .form-container {
             padding: 1.5rem;
           }
@@ -2191,8 +2961,22 @@ const Calenders = () => {
             padding: 1rem;
           }
 
-          .platform-options {
-            justify-content: center;
+          .banner-title {
+            font-size: 2rem;
+          }
+
+          .banner-subtitle {
+            font-size: 0.9rem;
+          }
+
+          .premium-banner {
+            min-height: 350px;
+          }
+
+          .platform-option {
+            width: 60px;
+            height: 60px;
+            padding: 0.5rem;
           }
         }
       `}</style>

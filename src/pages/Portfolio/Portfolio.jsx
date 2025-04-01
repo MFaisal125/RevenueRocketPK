@@ -927,7 +927,7 @@ export const Portfolio = () => {
           />
           <div className="banner-overlay"></div>
           <div className="banner-content">
-            <div className="banner-badge">Premium Portfolio</div>
+            {/* <div className="banner-badge">Premium Portfolio</div> */}
             <h1 className="banner-title">Creative Excellence</h1>
             <div className="banner-divider"></div>
             <p className="banner-subtitle">
@@ -943,7 +943,7 @@ export const Portfolio = () => {
 
           <div className="container">
             <div className="title animate-section" data-id="title">
-              <div className="title-badge">Our Work</div>
+              {/* <div className="title-badge">Our Work</div> */}
               <h2 className={`fade-up ${isVisible.title ? "visible" : ""}`}>
                 Featured Projects
               </h2>
