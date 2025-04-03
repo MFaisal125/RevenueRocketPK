@@ -405,208 +405,877 @@
 // };
 
 // export default Details;
-
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React from "react";
+
+import { useState, useEffect, useCallback, useMemo } from "react";
+import "./Details.css";
+import "../../assets/css/media-query.css";
+import Header from "../../Common/Header/Headers";
+import Footer from "../../Common/Footer/Footer";
 import { NavLink, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarAlt,
-  faUser,
-  faComment,
   faClock,
+  faEnvelope,
+  faPaperPlane,
+  faTag,
 } from "@fortawesome/free-solid-svg-icons";
-import Header from "../../Common/Header/Headers";
-import Footer from "../../Common/Footer/Footer";
 import img from "../../assets/image/software-engineer.jpeg";
+import "react-toastify/dist/ReactToastify.css";
+
+// Import API from premium-blog.jsx
+import { API } from "../Blogs/Blogs.jsx";
+
+// Memoized Comment Component for better performance
+const Comment = React.memo(({ item }) => {
+  return (
+    <div className="comment-item">
+      <div className="comment-avatar">
+        <img src={item.avatar || img} alt={item.author} loading="lazy" />
+      </div>
+      <div className="comment-content">
+        <div className="comment-header">
+          <div className="comment-author">{item.author}</div>
+          <div className="comment-date">{item.date}</div>
+        </div>
+        <div className="comment-text">{item.text}</div>
+      </div>
+    </div>
+  );
+});
+
+// Memoized Related Post Component
+const RelatedPost = React.memo(({ post, createSlug, extractSidebarTitle }) => {
+  return (
+    <div className="recent-post">
+      <div className="recent-post-image">
+        <img
+          src={post.thumbnail || "/placeholder.svg"}
+          alt={post.title}
+          loading="lazy"
+        />
+      </div>
+      <div className="recent-post-content">
+        <div className="recent-post-date">
+          <FontAwesomeIcon icon={faCalendarAlt} />
+          <span>{post.createAt}</span>
+        </div>
+        <h5 className="recent-post-title">
+          <NavLink to={`/blog/${post.id}/${createSlug(post.title)}`}>
+            {extractSidebarTitle(post.title)}
+          </NavLink>
+        </h5>
+      </div>
+    </div>
+  );
+});
+
+// Memoized Category Item Component
+const CategoryItem = React.memo(({ category, count, createSlug }) => {
+  return (
+    <li className="category-item">
+      <NavLink
+        to={`/blog/category/${createSlug(category)}`}
+        className="category-link"
+      >
+        <span>
+          <FontAwesomeIcon icon={faTag} className="mr-2" />
+          {category}
+        </span>
+        <span className="category-count">{count}</span>
+      </NavLink>
+    </li>
+  );
+});
+
+// Social Share Button Component
+const ShareButton = React.memo(({ icon, onClick }) => {
+  return (
+    <div className="share-button" onClick={onClick}>
+      <img src={icon || "/placeholder.svg"} alt="Share" loading="lazy" />
+    </div>
+  );
+});
 
 const Details = () => {
   const { id } = useParams();
-  const [data, setData] = useState([]);
-  const [allData, setAllData] = useState([]);
-  const [username, setUserName] = useState("");
+  const [post, setPost] = useState(null);
+  const [relatedPosts, setRelatedPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Comments state
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
-  const [commentData, setCommentData] = useState([0]);
-  const [scrollY, setScrollY] = useState(0);
-  const [isVisible, setIsVisible] = useState({
-    content: false,
-    sidebar: false,
-    comments: false,
-    form: false,
-  });
+  const [comments, setComments] = useState([]);
 
-  const bannerRef = useRef(null);
-  const contentRef = useRef(null);
-  const sidebarRef = useRef(null);
-  const commentsRef = useRef(null);
-  const formRef = useRef(null);
-
-  // Handle scroll for parallax and animations
+  // Add custom CSS for premium design with black background - optimized to run only once
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
+    // Create style element
+    const styleElement = document.createElement("style");
+    styleElement.id = "premium-blog-details-styles";
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Animation on scroll with IntersectionObserver
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.15,
-    };
-
-    const handleIntersect = (entries) => {
-      entries.forEach((entry) => {
-        const id = entry.target.getAttribute("data-id");
-        if (entry.isIntersecting) {
-          setIsVisible((prev) => ({ ...prev, [id]: true }));
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(handleIntersect, observerOptions);
-
-    const sections = document.querySelectorAll(".animate-section");
-    sections.forEach((section) => {
-      observer.observe(section);
-    });
-
-    return () => {
-      sections.forEach((section) => {
-        observer.unobserve(section);
-      });
-    };
-  }, []);
-
-  // Fetch blog post data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`https://api.lenexit.com/api/post/${id}`);
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.error("Error fetching post data:", error);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
-  // Fetch all blog posts
-  const allBlogs = async () => {
-    try {
-      const response = await fetch("https://api.lenexit.com/api/post/");
-      const result = await response.json();
-      setAllData(result);
-    } catch (error) {
-      console.error("Error fetching all posts:", error);
-    }
-  };
-
-  useEffect(() => {
-    allBlogs();
-  }, []);
-
-  // Social sharing functions
-  const pageUrl = location.href;
-
-  const whatsappShare = (title, text) => {
-    window.open(`https://wa.me/?text=${pageUrl} ${text}`);
-  };
-
-  const manualShare = (title, text) => {
-    navigator.share({
-      title: title,
-      text: text,
-      url: pageUrl,
-    });
-  };
-
-  const twitterShare = (title, text) => {
-    window.open(`https://twitter.com/intent/tweet?text=${pageUrl}. ${text}`);
-  };
-
-  const facebookShare = (title, text) => {
-    const encodedURL = encodeURIComponent(document.URL);
-    const navUrl =
-      "https://www.facebook.com/sharer/sharer.php?u=" + `${encodedURL}`;
-    window.open(navUrl, "_blank");
-  };
-
-  // Comment handling
-  const commentHandler = (id) => {
-    const d = new Date();
-    const day = d.getDate();
-    const month = d.getMonth() + 1;
-    const year = d.getFullYear();
-    const createat = `${day}-${month}-${year}`;
-
-    const commentData = {
-      author: "0",
-      description: comment,
-      createAt: createat,
-      rcomment: "",
-      comment_post: id,
-      status: "1",
-    };
-
-    if (username === "" || comment === "") {
-      toast.error("Please enter your name and comment!");
+    // Check if styles already exist to prevent duplication
+    if (document.getElementById("premium-blog-details-styles")) {
       return;
     }
 
-    fetch("https://api.lenexit.com/api/comment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(commentData),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        toast.success("Thanks for your comment!");
-        setUserName("");
-        setEmail("");
-        setComment("");
-        getAllComments();
-      })
-      .catch((error) => {
-        toast.error("Error submitting comment. Please try again.");
-        console.error("Error:", error);
-      });
-  };
+    // Add premium CSS with dark theme - optimized
+    styleElement.innerHTML = `
+      :root {
+        --primary: #ff5e14;
+        --primary-light: #ff7a3d;
+        --primary-dark: #e04d00;
+        --dark-bg: #121212;
+        --dark-surface: #1e1e1e;
+        --dark-card: #252525;
+        --dark-border: #333333;
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --text-tertiary: rgba(255, 255, 255, 0.5);
+        --box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        --box-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.4);
+        --transition: all 0.3s ease;
+      }
+      
+      body {
+        background-color: var(--dark-bg);
+        color: var(--text-primary);
+      }
+      
+      /* Article Header */
+      .article-header {
+        position: relative;
+        margin-bottom: 40px;
+      }
+      
+      .article-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+      }
+      
+      .article-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+      
+      .article-meta-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+      
+      .article-meta-item svg {
+        margin-right: 8px;
+        color: var(--primary);
+      }
+      
+      .article-featured-image {
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: var(--box-shadow);
+      }
+      
+      .article-featured-image img {
+        width: 100%;
+        object-fit: cover;
+        max-height: 500px;
+        will-change: transform;
+      }
+      
+      /* Article Content */
+      .article-container {
+        background: var(--dark-surface);
+        border-radius: 12px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid var(--dark-border);
+      }
+      
+      .article-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-secondary);
+      }
+      
+      .article-content p {
+        margin-bottom: 1.5rem;
+      }
+      
+      .article-content h2,
+      .article-content h3,
+      .article-content h4 {
+        color: var(--text-primary);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+      }
+      
+      .article-content a {
+        color: var(--primary);
+        text-decoration: none;
+        border-bottom: 1px dotted var(--primary);
+        transition: color 0.3s ease;
+      }
+      
+      .article-content a:hover {
+        color: var(--primary-light);
+      }
+      
+      .article-content ul,
+      .article-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+      }
+      
+      .article-content li {
+        margin-bottom: 0.5rem;
+      }
+      
+      /* Article Author */
+      .article-author {
+        display: flex;
+        align-items: center;
+        padding: 25px;
+        background: var(--dark-card);
+        border-radius: 12px;
+        margin: 40px 0;
+        border: 1px solid var(--dark-border);
+      }
+      
+      .author-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 20px;
+        border: 3px solid var(--primary);
+      }
+      
+      .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .author-info h4 {
+        margin: 0 0 5px;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+      }
+      
+      .author-info p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+      
+      /* Social Sharing */
+      .social-sharing {
+        display: flex;
+        align-items: center;
+        margin: 30px 0;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .share-label {
+        font-weight: 600;
+        margin-right: 15px;
+        color: var(--text-primary);
+      }
+      
+      .share-buttons {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .share-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--dark-card);
+        border: 1px solid var(--dark-border);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        will-change: transform;
+      }
+      
+      .share-button:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--box-shadow);
+      }
+      
+      .share-button img {
+        width: 20px;
+        height: 20px;
+      }
+      
+      /* Comments Section */
+      .comments-section {
+        background: var(--dark-surface);
+        border-radius: 12px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid var(--dark-border);
+      }
+      
+      .comments-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: var(--text-primary);
+        position: relative;
+        padding-bottom: 15px;
+      }
+      
+      .comments-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        border-radius: 3px;
+      }
+      
+      .comment-list {
+        margin-bottom: 40px;
+      }
+      
+      .comment-item {
+        display: flex;
+        padding: 20px;
+        background: var(--dark-card);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid var(--dark-border);
+      }
+      
+      .comment-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 20px;
+        flex-shrink: 0;
+      }
+      
+      .comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .comment-content {
+        flex: 1;
+      }
+      
+      .comment-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      
+      .comment-author {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      
+      .comment-date {
+        font-size: 0.85rem;
+        color: var(--text-tertiary);
+      }
+      
+      .comment-text {
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+      
+      /* Comment Form */
+      .comment-form {
+        background: var(--dark-card);
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid var(--dark-border);
+      }
+      
+      .comment-form-title {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+      
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        background-color: var(--dark-surface);
+        border: 1px solid var(--dark-border);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(255, 94, 20, 0.1);
+      }
+      
+      .form-control::placeholder {
+        color: var(--text-tertiary);
+      }
+      
+      textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+      }
+      
+      .submit-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 12px 25px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        will-change: transform;
+      }
+      
+      .submit-button:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+      
+      .submit-button svg {
+        margin-left: 8px;
+      }
+      
+      /* Sidebar */
+      .blog-sidebar {
+        position: sticky;
+        top: 100px;
+      }
+      
+      .sidebar-widget {
+        background: var(--dark-surface);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid var(--dark-border);
+      }
+      
+      .widget-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 25px;
+        position: relative;
+        padding-bottom: 15px;
+      }
+      
+      .widget-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        border-radius: 3px;
+      }
+      
+      .recent-post {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--dark-border);
+      }
+      
+      .recent-post:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+      
+      .recent-post-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      
+      .recent-post-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        will-change: transform;
+      }
+      
+      .recent-post:hover .recent-post-image img {
+        transform: scale(1.05);
+      }
+      
+      .recent-post-content {
+        padding-left: 15px;
+      }
+      
+      .recent-post-date {
+        font-size: 0.8rem;
+        color: var(--text-tertiary);
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+      }
+      
+      .recent-post-date svg {
+        margin-right: 5px;
+        color: var(--primary);
+      }
+      
+      .recent-post-title {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.4;
+        margin: 0;
+      }
+      
+      .recent-post-title a {
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+      
+      .recent-post-title a:hover {
+        color: var(--primary);
+      }
+      
+      /* Category widget */
+      .category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .category-item {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--dark-border);
+      }
+      
+      .category-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+      
+      .category-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+        font-weight: 500;
+      }
+      
+      .category-link:hover {
+        color: var(--primary);
+      }
+      
+      .category-count {
+        background: var(--dark-card);
+        color: var(--text-tertiary);
+        padding: 2px 10px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      
+      .category-link:hover .category-count {
+        background: var(--primary);
+        color: white;
+      }
+      
+      /* Loading State */
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 0;
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--dark-border);
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        margin-bottom: 20px;
+        animation: spin 1s linear infinite;
+        will-change: transform;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loading-text {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+      }
+      
+      /* Responsive */
+      @media (max-width: 991px) {
+        .article-container,
+        .comments-section {
+          padding: 30px;
+        }
+        
+        .article-title {
+          font-size: 2rem;
+        }
+        
+        .blog-sidebar {
+          margin-top: 50px;
+          position: static;
+        }
+      }
+      
+      @media (max-width: 767px) {
+        .article-container,
+        .comments-section {
+          padding: 25px;
+        }
+        
+        .article-title {
+          font-size: 1.8rem;
+        }
+        
+        .article-author {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .author-avatar {
+          margin-bottom: 15px;
+        }
+        
+        .sidebar-widget {
+          padding: 20px;
+        }
+      }
+      
+      @media (max-width: 575px) {
+        .article-container,
+        .comments-section {
+          padding: 20px;
+        }
+        
+        .article-title {
+          font-size: 1.5rem;
+        }
+        
+        .article-meta {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        
+        .comment-item {
+          flex-direction: column;
+        }
+        
+        .comment-avatar {
+          margin-bottom: 15px;
+        }
+      }
+    `;
 
-  // Fetch all comments
-  const getAllComments = async () => {
-    try {
-      const response = await fetch("https://api.lenexit.com/api/comment", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const result = await response.json();
-      setCommentData(result);
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-    }
-  };
+    // Append style to head
+    document.head.appendChild(styleElement);
 
-  useEffect(() => {
-    getAllComments();
+    // Cleanup function
+    return () => {
+      const existingStyle = document.getElementById(
+        "premium-blog-details-styles"
+      );
+      if (existingStyle) {
+        document.head.removeChild(existingStyle);
+      }
+    };
   }, []);
 
-  // Helper functions
-  const slugify = (text) => {
+  // Fetch post details - optimized with useCallback
+  const fetchPostDetails = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Use the API you created in premium-blog.jsx
+      const postData = await API.getBlogPostById(Number.parseInt(id));
+
+      if (!postData) {
+        throw new Error("Post not found");
+      }
+
+      setPost(postData);
+
+      // Fetch all posts for related content
+      const allPosts = await API.getAllBlogPosts();
+
+      // Filter for related posts (same category, excluding current post)
+      const related = allPosts
+        .filter(
+          (p) =>
+            p.id !== Number.parseInt(id) && p.category === postData.category
+        )
+        .slice(0, 3);
+
+      // If not enough related posts by category, add some recent posts
+      if (related.length < 3) {
+        const recentPosts = allPosts
+          .filter(
+            (p) =>
+              p.id !== Number.parseInt(id) &&
+              !related.some((r) => r.id === p.id)
+          )
+          .slice(0, 3 - related.length);
+
+        setRelatedPosts([...related, ...recentPosts]);
+      } else {
+        setRelatedPosts(related);
+      }
+
+      // Fetch comments for this post
+      fetchComments();
+
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching post details:", err);
+      setError("Failed to load blog post. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchPostDetails();
+
+    // Clean up function
+    return () => {
+      // Reset any timers or subscriptions if needed
+    };
+  }, [fetchPostDetails]);
+
+  // Function to fetch comments - memoized
+  const fetchComments = useCallback(async () => {
+    try {
+      // For now, we'll create some mock comments
+      // Replace with your actual API call when ready
+      const mockComments = [
+        {
+          id: 1,
+          author: "Sarah Johnson",
+          date: "June 12, 2023",
+          text: "This article was incredibly insightful. I've been struggling with revenue optimization for my business, and these strategies offer a fresh perspective that I hadn't considered before.",
+          avatar: img,
+        },
+        {
+          id: 2,
+          author: "David Chen",
+          date: "June 15, 2023",
+          text: "I implemented the third strategy mentioned in this article last month and have already seen a 15% increase in our recurring revenue. Thank you for sharing such actionable advice!",
+          avatar: img,
+        },
+      ];
+
+      setComments(mockComments);
+    } catch (err) {
+      console.error("Error fetching comments:", err);
+      // We don't want to show error for comments failing to load
+      // as the main content is more important
+    }
+  }, []);
+
+  // Function to handle comment submission - memoized
+  const handleCommentSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      if (!username.trim() || !comment.trim()) {
+        toast.error("Please enter your name and comment");
+        return;
+      }
+
+      // For demo purposes, we'll just add the comment to local state
+      // In a real app, you would send this to your API
+      const newComment = {
+        id: comments.length + 1,
+        author: username,
+        date: new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        text: comment,
+        avatar: img, // Default avatar
+      };
+
+      setComments((prevComments) => [...prevComments, newComment]);
+      toast.success("Comment added successfully!");
+
+      // Reset form
+      setUsername("");
+      setEmail("");
+      setComment("");
+    },
+    [username, email, comment, comments]
+  );
+
+  // Function to create URL-friendly slugs - memoized
+  const createSlug = useCallback((text) => {
     return text
       .toString()
       .toLowerCase()
@@ -614,1041 +1283,327 @@ const Details = () => {
       .replace(/\s+/g, "-")
       .replace(/[^a-zA-Z0-9-]/g, "")
       .replace(/--+/g, "-");
-  };
+  }, []);
 
-  const extractWordsFromTitle = (title) => {
+  // Extract title for sidebar - memoized
+  const extractSidebarTitle = useCallback((title) => {
     const words = title.split(" ");
-    const firstWords = words.slice(0, Math.min(words.length - 1, 2)).join(" ");
-    const lastWord = words[words.length - 1];
-    return `${firstWords} ${lastWord}`;
-  };
+    if (words.length <= 4) return title;
+    return `${words.slice(0, 3).join(" ")}...`;
+  }, []);
 
-  const formatDate = (dateString) => {
-    try {
-      const [day, month, year] = dateString.split("-");
-      return new Date(year, month - 1, day).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
+  // Social sharing functions - memoized
+  const pageUrl = useMemo(() => window.location.href, []);
+
+  const handleWhatsAppShare = useCallback(() => {
+    window.open(`https://wa.me/?text=${pageUrl} ${post?.title}`);
+  }, [pageUrl, post?.title]);
+
+  const handleTwitterShare = useCallback(() => {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${pageUrl}. ${post?.title}`
+    );
+  }, [pageUrl, post?.title]);
+
+  const handleFacebookShare = useCallback(() => {
+    const encodedURL = encodeURIComponent(window.location.href);
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodedURL}`,
+      "_blank"
+    );
+  }, []);
+
+  const handleShare = useCallback(() => {
+    if (navigator.share) {
+      navigator.share({
+        title: post?.title,
+        text: post?.description,
+        url: pageUrl,
       });
-    } catch (error) {
-      return dateString;
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      handleFacebookShare();
     }
-  };
+  }, [post, pageUrl, handleFacebookShare]);
 
-  // Calculate reading time
-  const calculateReadingTime = (text) => {
-    const wordsPerMinute = 200;
-    const textLength = text.split(" ").length;
-    if (textLength > 0) {
-      const readingTime = Math.ceil(textLength / wordsPerMinute);
-      return readingTime < 1 ? "1 min read" : `${readingTime} min read`;
-    }
-    return "1 min read";
-  };
+  // Calculate reading time - memoized
+  const getReadingTime = useCallback((text) => {
+    // Average reading speed: 200 words per minute
+    const wordCount = text?.split(/\s+/).length || 0;
+    const readingTime = Math.ceil(wordCount / 200);
+    return Math.max(readingTime, 2); // Minimum 2 minutes
+  }, []);
+
+  // Memoized categories for sidebar
+  const categories = useMemo(() => {
+    return [
+      "Business Growth",
+      "Revenue Strategy",
+      "Marketing",
+      "Technology",
+      "Financial Tips",
+    ];
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Header tags={window.location.href} />
+        <section className="py-5">
+          <div className="container">
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p className="loading-text">Loading article...</p>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <>
+        <Header tags={window.location.href} />
+        <section className="py-5">
+          <div className="container">
+            <div className="error-container">
+              <p className="error-message">{error || "Post not found"}</p>
+              <NavLink to="/blog" className="btn btn-primary mt-3">
+                Back to Blog
+              </NavLink>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
-      <Header tags={location.href} />
-
-      <style jsx>{`
-        /* Ultra Premium Dark Theme Styling */
-        @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
-
-        #blog-details-page {
-          font-family: "Montserrat", sans-serif;
-          color: #1a1a1a;
-          background-color: #f9f9f9;
-          overflow-x: hidden;
-          position: relative;
-        }
-
-        .container {
-          max-width: 1300px;
-          margin: 0 auto;
-          padding: 0 1.5rem;
-          position: relative;
-          z-index: 2;
-        }
-
-        .details-wrapper {
-          padding: 0 0 6rem;
-        }
-
-        /* Background Elements */
-        .bg-gradient-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(
-              circle at 15% 50%,
-              rgba(56, 189, 248, 0.04) 0%,
-              transparent 25%
-            ),
-            radial-gradient(
-              circle at 85% 30%,
-              rgba(168, 85, 247, 0.04) 0%,
-              transparent 25%
-            );
-          pointer-events: none;
-          z-index: 1;
-        }
-
-        /* Custom Premium Banner */
-        .premium-banner {
-          position: relative;
-          height: 70vh;
-          min-height: 500px;
-          width: 100%;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 4rem;
-        }
-
-        .banner-image {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          z-index: 1;
-          filter: brightness(0.4) contrast(1.2);
-        }
-
-        .banner-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            to bottom,
-            rgba(10, 10, 10, 0.7),
-            rgba(10, 10, 10, 0.9)
-          );
-          z-index: 2;
-        }
-
-        .banner-content {
-          position: relative;
-          z-index: 3;
-          text-align: center;
-          max-width: 900px;
-          padding: 0 2rem;
-        }
-
-        .banner-title {
-          font-size: 3.5rem;
-          font-weight: 800;
-          letter-spacing: -1px;
-          margin-bottom: 1.5rem;
-          line-height: 1.1;
-          background: linear-gradient(135deg, #ffffff 0%, #d4d4d8 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          position: relative;
-          display: inline-block;
-          font-family: "Playfair Display", serif;
-        }
-
-        .banner-title::after {
-          content: "";
-          position: absolute;
-          bottom: -15px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 100px;
-          height: 3px;
-          background: linear-gradient(90deg, #c084fc, #818cf8);
-        }
-
-        .banner-meta {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 2rem;
-          margin-top: 2.5rem;
-          color: #d4d4d8;
-        }
-
-        .banner-meta-item {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.9rem;
-          font-weight: 500;
-        }
-
-        /* Main Content Area */
-        .content-grid {
-          display: grid;
-          grid-template-columns: 2fr 1fr;
-          gap: 3rem;
-          position: relative;
-        }
-
-        /* Blog Content */
-        .blog-content {
-          background: #ffffff;
-          border-radius: 8px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          overflow: hidden;
-          position: relative;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .blog-content-inner {
-          padding: 3rem;
-        }
-
-        .blog-content-header {
-          margin-bottom: 2rem;
-        }
-
-        .blog-title {
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #1a1a1a;
-          margin-bottom: 1.5rem;
-          line-height: 1.2;
-          font-family: "Playfair Display", serif;
-        }
-
-        .blog-meta {
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 1.5rem;
-          margin-bottom: 1.5rem;
-          color: #64748b;
-          font-size: 0.9rem;
-        }
-
-        .blog-meta-item {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .blog-featured-image {
-          width: 100%;
-          height: auto;
-          border-radius: 6px;
-          margin-bottom: 2rem;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .blog-author {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin: 2rem 0;
-          padding: 1.5rem;
-          background: #f8f9fa;
-          border-radius: 8px;
-        }
-
-        .author-info {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .author-avatar {
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid #fff;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .author-name {
-          font-weight: 600;
-          color: #1a1a1a;
-          margin: 0;
-          font-size: 1rem;
-        }
-
-        .blog-share {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .share-button {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #ffffff;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .share-button:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .share-button img {
-          width: 20px;
-          height: 20px;
-        }
-
-        .blog-description {
-          font-size: 1.1rem;
-          line-height: 1.8;
-          color: #334155;
-          margin-bottom: 2rem;
-        }
-
-        .blog-description p {
-          margin-bottom: 1.5rem;
-        }
-
-        .blog-description h2,
-        .blog-description h3 {
-          font-family: "Playfair Display", serif;
-          margin-top: 2.5rem;
-          margin-bottom: 1.5rem;
-          color: #1a1a1a;
-        }
-
-        .blog-description h2 {
-          font-size: 1.8rem;
-        }
-
-        .blog-description h3 {
-          font-size: 1.5rem;
-        }
-
-        .blog-description a {
-          color: #6366f1;
-          text-decoration: none;
-          border-bottom: 1px solid transparent;
-          transition: border-color 0.3s ease;
-        }
-
-        .blog-description a:hover {
-          border-color: #6366f1;
-        }
-
-        .blog-description img {
-          max-width: 100%;
-          border-radius: 6px;
-          margin: 2rem 0;
-        }
-
-        .blog-description ul,
-        .blog-description ol {
-          margin-left: 1.5rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .blog-description li {
-          margin-bottom: 0.5rem;
-        }
-
-        .blog-description blockquote {
-          border-left: 4px solid #6366f1;
-          padding-left: 1.5rem;
-          margin-left: 0;
-          margin-right: 0;
-          font-style: italic;
-          color: #4b5563;
-        }
-
-        /* Comments Section */
-        .comments-section {
-          margin-top: 4rem;
-          background: #ffffff;
-          border-radius: 8px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          padding: 3rem;
-        }
-
-        .comments-title {
-          font-size: 1.8rem;
-          font-weight: 700;
-          color: #1a1a1a;
-          margin-bottom: 2rem;
-          position: relative;
-          padding-bottom: 1rem;
-          font-family: "Playfair Display", serif;
-        }
-
-        .comments-title::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 60px;
-          height: 3px;
-          background: linear-gradient(90deg, #6366f1, #8b5cf6);
-        }
-
-        .comment-form {
-          margin-top: 3rem;
-        }
-
-        .form-group {
-          margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-          color: #1a1a1a;
-        }
-
-        .form-control {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          font-size: 1rem;
-          border: 1px solid #e2e8f0;
-          border-radius: 6px;
-          background: #f8fafc;
-          transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-          outline: none;
-          border-color: #6366f1;
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-          background: #ffffff;
-        }
-
-        textarea.form-control {
-          min-height: 120px;
-          resize: vertical;
-        }
-
-        .submit-button {
-          display: inline-block;
-          padding: 0.75rem 2rem;
-          font-size: 1rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #ffffff;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-        }
-
-        .submit-button:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .submit-button:active {
-          transform: translateY(-1px);
-        }
-
-        /* Sidebar */
-        .blog-sidebar {
-          position: sticky;
-          top: 2rem;
-        }
-
-        .sidebar-widget {
-          background: #ffffff;
-          border-radius: 8px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          overflow: hidden;
-          margin-bottom: 2.5rem;
-        }
-
-        .widget-title {
-          font-size: 1.2rem;
-          font-weight: 700;
-          color: #1a1a1a;
-          padding: 1.5rem;
-          margin: 0;
-          border-bottom: 1px solid #f1f5f9;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          position: relative;
-        }
-
-        .widget-title::after {
-          content: "";
-          position: absolute;
-          bottom: -1px;
-          left: 1.5rem;
-          width: 40px;
-          height: 3px;
-          background: linear-gradient(90deg, #6366f1, #8b5cf6);
-        }
-
-        .widget-content {
-          padding: 1.5rem;
-        }
-
-        .featured-post {
-          margin-bottom: 1.5rem;
-        }
-
-        .featured-post-image {
-          width: 100%;
-          height: auto;
-          border-radius: 6px;
-          margin-bottom: 1rem;
-        }
-
-        .recent-posts {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-
-        .recent-post {
-          display: flex;
-          gap: 1rem;
-          padding-bottom: 1.25rem;
-          border-bottom: 1px solid #f1f5f9;
-        }
-
-        .recent-post:last-child {
-          border-bottom: none;
-          padding-bottom: 0;
-        }
-
-        .recent-post-image {
-          width: 80px;
-          height: 80px;
-          object-fit: cover;
-          border-radius: 6px;
-          flex-shrink: 0;
-        }
-
-        .recent-post-content {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .recent-post-date {
-          font-size: 0.8rem;
-          color: #64748b;
-          margin: 0;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .recent-post-title {
-          font-size: 0.95rem;
-          font-weight: 600;
-          color: #1a1a1a;
-          margin: 0.5rem 0 0;
-          line-height: 1.4;
-          transition: color 0.3s ease;
-        }
-
-        .recent-post-title:hover {
-          color: #6366f1;
-        }
-
-        /* Animation Classes */
-        .fade-in {
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.8s cubic-bezier(0.215, 0.61, 0.355, 1),
-            transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
-
-        .fade-in.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .fade-in-left {
-          opacity: 0;
-          transform: translateX(-30px);
-          transition: opacity 0.8s cubic-bezier(0.215, 0.61, 0.355, 1),
-            transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
-
-        .fade-in-left.visible {
-          opacity: 1;
-          transform: translateX(0);
-        }
-
-        .fade-in-right {
-          opacity: 0;
-          transform: translateX(30px);
-          transition: opacity 0.8s cubic-bezier(0.215, 0.61, 0.355, 1),
-            transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
-
-        .fade-in-right.visible {
-          opacity: 1;
-          transform: translateX(0);
-        }
-
-        .stagger-item {
-          opacity: 0;
-          transform: translateY(20px);
-          transition: opacity 0.5s cubic-bezier(0.215, 0.61, 0.355, 1),
-            transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
-
-        .stagger-visible .stagger-item:nth-child(1) {
-          transition-delay: 0.1s;
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .stagger-visible .stagger-item:nth-child(2) {
-          transition-delay: 0.2s;
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .stagger-visible .stagger-item:nth-child(3) {
-          transition-delay: 0.3s;
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .stagger-visible .stagger-item:nth-child(4) {
-          transition-delay: 0.4s;
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .stagger-visible .stagger-item:nth-child(5) {
-          transition-delay: 0.5s;
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-          .banner-title {
-            font-size: 3rem;
-          }
-
-          .content-grid {
-            gap: 2rem;
-          }
-
-          .blog-content-inner {
-            padding: 2.5rem;
-          }
-        }
-
-        @media (max-width: 992px) {
-          .content-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .blog-sidebar {
-            position: static;
-            margin-top: 3rem;
-          }
-
-          .banner-title {
-            font-size: 2.5rem;
-          }
-
-          .premium-banner {
-            height: 60vh;
-            min-height: 450px;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .blog-content-inner,
-          .comments-section {
-            padding: 2rem;
-          }
-
-          .blog-title {
-            font-size: 2rem;
-          }
-
-          .blog-meta {
-            gap: 1rem;
-          }
-
-          .banner-title {
-            font-size: 2.2rem;
-          }
-
-          .banner-meta {
-            gap: 1.5rem;
-          }
-
-          .premium-banner {
-            height: 50vh;
-            min-height: 400px;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .container {
-            padding: 0 1rem;
-          }
-
-          .blog-content-inner,
-          .comments-section {
-            padding: 1.5rem;
-          }
-
-          .blog-title {
-            font-size: 1.75rem;
-          }
-
-          .blog-author {
-            flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
-          }
-
-          .blog-share {
-            margin-top: 1rem;
-          }
-
-          .banner-title {
-            font-size: 1.8rem;
-          }
-
-          .banner-meta {
-            flex-direction: column;
-            gap: 0.75rem;
-            align-items: center;
-          }
-
-          .premium-banner {
-            height: 40vh;
-            min-height: 300px;
-          }
-        }
-      `}</style>
-
-      <section id="blog-details-page">
-        {/* Background Gradient Overlay */}
-        <div className="bg-gradient-overlay"></div>
-
-        {data.length > 0 && (
-          <>
-            {/* Custom Premium Banner */}
-            <div className="premium-banner" ref={bannerRef}>
-              <img
-                src={data[0].thumbnail || "/placeholder.svg"}
-                alt={data[0].title}
-                className="banner-image"
-                style={{ transform: `translateY(${scrollY * 0.2}px)` }}
-              />
-              <div className="banner-overlay"></div>
-              <div className="banner-content">
-                <h1 className="banner-title">{data[0].title}</h1>
-                <div className="banner-meta">
-                  <div className="banner-meta-item">
-                    <FontAwesomeIcon icon={faUser} />
-                    <span>Muhammad Faisal</span>
+      <Header tags={window.location.href} />
+
+      <section className="py-5">
+        <div className="container">
+          <div className="row">
+            {/* Main Content */}
+            <div className="col-lg-8">
+              {/* Article Container */}
+              <article className="article-container">
+                {/* Article Header */}
+                <header className="article-header">
+                  <h1 className="article-title">{post.title}</h1>
+
+                  <div className="article-meta">
+                    <div className="article-meta-item">
+                      <FontAwesomeIcon icon={faCalendarAlt} />
+                      <span>{post.createAt}</span>
+                    </div>
+
+                    <div className="article-meta-item">
+                      <FontAwesomeIcon icon={faClock} />
+                      <span>{getReadingTime(post.description)} min read</span>
+                    </div>
+
+                    <div className="article-meta-item">
+                      <FontAwesomeIcon icon={faTag} />
+                      <span>{post.category}</span>
+                    </div>
                   </div>
-                  <div className="banner-meta-item">
-                    <FontAwesomeIcon icon={faCalendarAlt} />
-                    <span>{formatDate(data[0].createAt)}</span>
+                </header>
+
+                {/* Featured Image */}
+                <div className="article-featured-image">
+                  <img
+                    src={post.thumbnail || "/placeholder.svg"}
+                    alt={post.title}
+                    title={post.title}
+                    loading="lazy"
+                  />
+                </div>
+
+                {/* Article Content */}
+                <div
+                  className="article-content"
+                  dangerouslySetInnerHTML={{ __html: post.description }}
+                ></div>
+
+                {/* Author Section */}
+                <div className="article-author">
+                  <div className="author-avatar">
+                    <img
+                      src={post.author?.image || img}
+                      alt={post.author?.name || "Author"}
+                      loading="lazy"
+                    />
                   </div>
-                  <div className="banner-meta-item">
-                    <FontAwesomeIcon icon={faClock} />
-                    <span>
-                      {calculateReadingTime(
-                        data[0].descrioption.replace(/<[^>]*>/g, "")
-                      )}
-                    </span>
+                  <div className="author-info">
+                    <h4>{post.author?.name || "Author"}</h4>
+                    <p>
+                      Content specialist with expertise in business growth
+                      strategies and revenue optimization. Passionate about
+                      helping businesses reach their full potential through
+                      data-driven approaches.
+                    </p>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="container">
-              <div className="details-wrapper">
-                <div className="content-grid">
-                  {/* Main Content */}
-                  <div
-                    className="animate-section"
-                    data-id="content"
-                    ref={contentRef}
-                  >
-                    <div
-                      className={`blog-content fade-in ${
-                        isVisible.content ? "visible" : ""
-                      }`}
-                    >
-                      <div className="blog-content-inner">
-                        <div className="blog-content-header">
-                          <h2 className="blog-title">{data[0].title}</h2>
-                          <div className="blog-meta">
-                            <div className="blog-meta-item">
-                              <FontAwesomeIcon icon={faUser} />
-                              <span>Muhammad Faisal</span>
-                            </div>
-                            <div className="blog-meta-item">
-                              <FontAwesomeIcon icon={faCalendarAlt} />
-                              <span>{formatDate(data[0].createAt)}</span>
-                            </div>
-                            <div className="blog-meta-item">
-                              <FontAwesomeIcon icon={faClock} />
-                              <span>
-                                {calculateReadingTime(
-                                  data[0].descrioption.replace(/<[^>]*>/g, "")
-                                )}
-                              </span>
-                            </div>
-                            <div className="blog-meta-item">
-                              <FontAwesomeIcon icon={faComment} />
-                              <span>{commentData.length} Comments</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="blog-author">
-                          <div className="author-info">
-                            <img
-                              src={img || "/placeholder.svg"}
-                              className="author-avatar"
-                              alt="Muhammad Faisal"
-                              title="Muhammad Faisal"
-                            />
-                            <h4 className="author-name">Muhammad Faisal</h4>
-                          </div>
-                          <div className="blog-share">
-                            <div
-                              className="share-button"
-                              onClick={() =>
-                                whatsappShare(
-                                  data[0].title,
-                                  data[0].descrioption
-                                    .replace(/<[^>]*>/g, "")
-                                    .slice(0, 150)
-                                )
-                              }
-                            >
-                              <img
-                                src="https://img.icons8.com/ios-glyphs/30/53CE55/whatsapp.png"
-                                alt="whatsapp"
-                              />
-                            </div>
-                            <div
-                              className="share-button"
-                              onClick={() =>
-                                facebookShare(
-                                  data[0].title,
-                                  data[0].descrioption
-                                    .replace(/<[^>]*>/g, "")
-                                    .slice(0, 150)
-                                )
-                              }
-                            >
-                              <img
-                                src="https://img.icons8.com/color/48/facebook-new.png"
-                                alt="facebook-new"
-                              />
-                            </div>
-                            <div
-                              className="share-button"
-                              onClick={() =>
-                                twitterShare(
-                                  data[0].title,
-                                  data[0].descrioption
-                                    .replace(/<[^>]*>/g, "")
-                                    .slice(0, 150)
-                                )
-                              }
-                            >
-                              <img
-                                src="https://img.icons8.com/color/48/twitter--v1.png"
-                                alt="twitter"
-                              />
-                            </div>
-                            <div
-                              className="share-button"
-                              onClick={() =>
-                                manualShare(data[0].title, data[0].descrioption)
-                              }
-                            >
-                              <img
-                                src="https://img.icons8.com/color/48/share--v1.png"
-                                alt="share"
-                                title={data[0].title}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="blog-description">
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: data[0].descrioption,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Comments Section */}
-                    <div
-                      className="animate-section"
-                      data-id="comments"
-                      ref={commentsRef}
-                    >
-                      <div
-                        className={`comments-section fade-in ${
-                          isVisible.comments ? "visible" : ""
-                        }`}
-                      >
-                        <h3 className="comments-title">Leave A Comment</h3>
-                        <ToastContainer position="top-right" autoClose={3000} />
-
-                        <div
-                          className="animate-section"
-                          data-id="form"
-                          ref={formRef}
-                        >
-                          <div
-                            className={`comment-form fade-in ${
-                              isVisible.form ? "visible" : ""
-                            } stagger-visible`}
-                          >
-                            <div className="form-group stagger-item">
-                              <label htmlFor="username">
-                                Username<span className="text-danger">*</span>
-                              </label>
-                              <input
-                                type="text"
-                                required
-                                className="form-control"
-                                value={username}
-                                onChange={(e) => setUserName(e.target.value)}
-                                name="username"
-                                id="username"
-                                placeholder="Your name"
-                              />
-                            </div>
-                            <div className="form-group stagger-item">
-                              <label htmlFor="email">Email</label>
-                              <input
-                                type="email"
-                                className="form-control"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                name="email"
-                                id="email"
-                                placeholder="Your email address"
-                              />
-                            </div>
-                            <div className="form-group stagger-item">
-                              <label htmlFor="comment">
-                                Comment<span className="text-danger">*</span>
-                              </label>
-                              <textarea
-                                required
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                className="form-control"
-                                name="comment"
-                                id="comment"
-                                rows="3"
-                                placeholder="Your comment"
-                              ></textarea>
-                            </div>
-                            <button
-                              className="submit-button stagger-item"
-                              onClick={() => commentHandler(data[0].id)}
-                            >
-                              Submit Comment
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Sidebar */}
-                  <div
-                    className="animate-section"
-                    data-id="sidebar"
-                    ref={sidebarRef}
-                  >
-                    <div
-                      className={`blog-sidebar fade-in-right ${
-                        isVisible.sidebar ? "visible" : ""
-                      }`}
-                    >
-                      {/* Featured Post Widget */}
-                      <div className="sidebar-widget">
-                        <h3 className="widget-title">Featured Post</h3>
-                        <div className="widget-content">
-                          <div className="featured-post">
-                            <img
-                              src={data[0].thumbnail || "/placeholder.svg"}
-                              className="featured-post-image"
-                              alt={data[0].title}
-                              title={data[0].title}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Recent Posts Widget */}
-                      <div className="sidebar-widget">
-                        <h3 className="widget-title">Recent Posts</h3>
-                        <div className="widget-content">
-                          <div className="recent-posts">
-                            {allData.slice(0, 5).map((item) => (
-                              <div className="recent-post" key={item.id}>
-                                <img
-                                  src={item.thumbnail || "/placeholder.svg"}
-                                  className="recent-post-image"
-                                  alt={item.title}
-                                  title={item.title}
-                                />
-                                <div className="recent-post-content">
-                                  <p className="recent-post-date">
-                                    <FontAwesomeIcon icon={faCalendarAlt} />
-                                    {formatDate(item.createAt)}
-                                  </p>
-                                  <NavLink
-                                    to={`/blog/${item.id}/${slugify(
-                                      item.title
-                                    )}`}
-                                  >
-                                    <h4 className="recent-post-title">
-                                      {extractWordsFromTitle(item.title)}
-                                    </h4>
-                                  </NavLink>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                {/* Social Sharing */}
+                <div className="social-sharing">
+                  <div className="share-label">Share this article:</div>
+                  <div className="share-buttons">
+                    <ShareButton
+                      icon="https://img.icons8.com/ios-glyphs/30/53CE55/whatsapp.png"
+                      onClick={handleWhatsAppShare}
+                    />
+                    <ShareButton
+                      icon="https://img.icons8.com/color/48/facebook-new.png"
+                      onClick={handleFacebookShare}
+                    />
+                    <ShareButton
+                      icon="https://img.icons8.com/color/48/twitter--v1.png"
+                      onClick={handleTwitterShare}
+                    />
+                    <ShareButton
+                      icon="https://img.icons8.com/color/48/share--v1.png"
+                      onClick={handleShare}
+                    />
                   </div>
                 </div>
-              </div>
+              </article>
+
+              {/* Comments Section */}
+              <section className="comments-section">
+                <h3 className="comments-title">Comments ({comments.length})</h3>
+
+                {comments.length > 0 ? (
+                  <div className="comment-list">
+                    {comments.map((item) => (
+                      <Comment key={item.id} item={item} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center my-4">
+                    No comments yet. Be the first to comment!
+                  </p>
+                )}
+
+                {/* Comment Form */}
+                <div className="comment-form">
+                  <h4 className="comment-form-title">Leave a Comment</h4>
+                  <ToastContainer position="top-right" theme="dark" />
+
+                  <form onSubmit={handleCommentSubmit}>
+                    <div className="form-group">
+                      <label htmlFor="username">
+                        Name <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="username"
+                        className="form-control"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Your name"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="email">Email</label>
+                      <input
+                        type="email"
+                        id="email"
+                        className="form-control"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Your email (optional)"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="comment">
+                        Comment <span className="text-danger">*</span>
+                      </label>
+                      <textarea
+                        id="comment"
+                        className="form-control"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder="Your comment"
+                        required
+                        rows="4"
+                      ></textarea>
+                    </div>
+
+                    <button type="submit" className="submit-button">
+                      Post Comment <FontAwesomeIcon icon={faPaperPlane} />
+                    </button>
+                  </form>
+                </div>
+              </section>
             </div>
-          </>
-        )}
+
+            {/* Sidebar */}
+            <div className="col-lg-4">
+              <aside className="blog-sidebar">
+                {/* Related Posts Widget */}
+                <div className="sidebar-widget">
+                  <h4 className="widget-title">Related Posts</h4>
+                  {relatedPosts.map((post) => (
+                    <RelatedPost
+                      key={`recent-${post.id}`}
+                      post={post}
+                      createSlug={createSlug}
+                      extractSidebarTitle={extractSidebarTitle}
+                    />
+                  ))}
+                </div>
+
+                {/* Categories Widget */}
+                <div className="sidebar-widget">
+                  <h4 className="widget-title">Categories</h4>
+                  <ul className="category-list">
+                    {categories.map((category, index) => (
+                      <CategoryItem
+                        key={index}
+                        category={category}
+                        count={Math.floor(Math.random() * 10) + 2}
+                        createSlug={createSlug}
+                      />
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Newsletter Widget */}
+                <div className="sidebar-widget">
+                  <h4 className="widget-title">Subscribe</h4>
+                  <p className="mb-3">
+                    Get the latest articles and business updates that you care
+                    about
+                  </p>
+                  <form>
+                    <div className="form-group">
+                      <input
+                        type="email"
+                        className="form-control"
+                        placeholder="Your email address"
+                        required
+                      />
+                    </div>
+                    <button type="submit" className="submit-button w-100">
+                      Subscribe <FontAwesomeIcon icon={faEnvelope} />
+                    </button>
+                  </form>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
       </section>
+
       <Footer />
     </>
   );

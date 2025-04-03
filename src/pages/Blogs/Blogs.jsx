@@ -186,8 +186,6 @@ import blog_banner from "../../assets/image/blog_banner.jpg";
 import { NavLink } from "react-router-dom";
 import Header from "../../Common/Header/Headers";
 import Footer from "../../Common/Footer/Footer";
-// Import removed as we'll create our own banner
-// import Banner from "../../Common/Banners/Banner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarAlt,
@@ -226,7 +224,7 @@ const PremiumBanner = ({ Img, title, color }) => {
       <div className="banner-shape-divider">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
           <path
-            fill="#ffffff"
+            fill="#121212"
             fillOpacity="1"
             d="M0,96L80,112C160,128,320,160,480,160C640,160,800,128,960,122.7C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"
           ></path>
@@ -236,31 +234,220 @@ const PremiumBanner = ({ Img, title, color }) => {
   );
 };
 
+// Internal API - Mock Data with Website Related Content
+export const API = {
+  getAllBlogPosts: async () => {
+    // Simulate network delay for realistic API feeling
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Generate current date and dates in the past for blog posts
+    const currentDate = new Date();
+    const formatDate = (date) => {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return date.toLocaleDateString("en-US", options);
+    };
+
+    // Website related blog categories
+    const categories = [
+      "Revenue Strategy",
+      "Marketing",
+      "Business Growth",
+      "Financial Tips",
+      "Technology",
+      "Sales Optimization",
+      "Market Analysis",
+    ];
+
+    // Website related author information
+    const authors = [
+      { name: "Mustafa Khan", image: img },
+      { name: "Sarah Johnson", image: img },
+      { name: "David Chen", image: img },
+      { name: "Priya Sharma", image: img },
+    ];
+
+    // Generate random reading time between 3-15 minutes
+    const getRandomReadingTime = () => Math.floor(Math.random() * 12) + 3;
+
+    // Custom mock blog data related to the website theme (Revenue Rocket)
+    const mockBlogPosts = [
+      {
+        id: 1,
+        title: "7 Proven Strategies to Boost Your Revenue in 2023",
+        description:
+          "<p>Discover the latest strategies that top companies are using to increase their revenue streams and improve profitability. This comprehensive guide breaks down actionable tactics that you can implement immediately.</p><p>We'll cover diversification of income channels, pricing optimization, customer retention programs, and much more. Our data-driven approach ensures you can measure results effectively.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Revenue Strategy",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 2 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[0],
+      },
+      {
+        id: 2,
+        title: "Digital Marketing Trends That Will Transform Your Business",
+        description:
+          "<p>Stay ahead of the curve with these cutting-edge digital marketing trends that are reshaping how businesses connect with their audiences. From AI-powered personalization to interactive content experiences.</p><p>We dive deep into practical applications of these trends with real-world case studies and implementation strategies tailored for businesses of all sizes.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Marketing",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 5 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[1],
+      },
+      {
+        id: 3,
+        title: "How to Scale Your Business Without Scaling Your Costs",
+        description:
+          "<p>Scaling efficiently is the holy grail of business growth. This article explores strategic approaches to expanding your business operations while keeping costs under control.</p><p>Learn how to leverage technology, automation, and strategic outsourcing to create sustainable growth models that maximize your return on investment and position your company for long-term success.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Business Growth",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[2],
+      },
+      {
+        id: 4,
+        title: "Financial Planning Essentials for Growing Businesses",
+        description:
+          "<p>Solid financial planning is the backbone of any successful business growth strategy. This guide provides a step-by-step approach to creating robust financial plans that support your business objectives.</p><p>We cover cash flow management, capital allocation, investment prioritization, and risk mitigation techniques designed specifically for businesses in growth phases.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Financial Tips",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 10 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[3],
+      },
+      {
+        id: 5,
+        title: "Revolutionize Your Sales Process with These Tech Solutions",
+        description:
+          "<p>Technology is transforming how businesses approach sales. From AI-powered lead scoring to automated follow-up systems, the right tech stack can dramatically improve your conversion rates.</p><p>This comprehensive overview highlights the most effective sales technologies, with practical advice on implementation and integration with your existing systems.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Technology",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 12 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[0],
+      },
+      {
+        id: 6,
+        title: "Customer Retention Strategies That Maximize Lifetime Value",
+        description:
+          "<p>Acquiring new customers costs significantly more than retaining existing ones. This in-depth article explores proven strategies for building customer loyalty and maximizing lifetime value.</p><p>Learn how to implement effective loyalty programs, personalized communication strategies, and exceptional customer service protocols that keep customers coming back and spending more.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Revenue Strategy",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 15 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[1],
+      },
+      {
+        id: 7,
+        title: "Building a High-Performance Team for Sustainable Growth",
+        description:
+          "<p>Your team is the engine that drives your business forward. This guide provides actionable insights on recruiting, developing, and retaining top talent that aligns with your company's vision and culture.</p><p>Discover frameworks for effective team structure, performance management, and creating an environment that fosters innovation and continuous improvement.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Business Growth",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 18 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[2],
+      },
+      {
+        id: 8,
+        title: "Data-Driven Decision Making: A Guide for Modern Businesses",
+        description:
+          "<p>In today's competitive landscape, making decisions based on data rather than intuition can be the difference between success and failure. This comprehensive guide walks you through the process of implementing data-driven decision-making in your organization.</p><p>Learn about key metrics to track, tools for data collection and analysis, and frameworks for turning insights into actionable business strategies.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Technology",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 21 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[3],
+      },
+      {
+        id: 9,
+        title: "Market Expansion: Identifying and Capturing New Opportunities",
+        description:
+          "<p>Expanding into new markets is a critical growth strategy, but it comes with significant challenges. This article provides a structured approach to identifying, evaluating, and successfully entering new market segments.</p><p>Explore techniques for market research, competitive analysis, and developing entry strategies that minimize risk while maximizing growth potential.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1559526324-593bc073d938?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Market Analysis",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 24 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[0],
+      },
+      {
+        id: 10,
+        title: "Creating a Recession-Proof Revenue Model for Your Business",
+        description:
+          "<p>Economic downturns are inevitable, but their impact on your business doesn't have to be devastating. This strategic guide shows how to build resilience into your revenue model to withstand economic fluctuations.</p><p>Learn about diversifying revenue streams, creating predictable recurring revenue, and implementing flexible pricing strategies that can adapt to changing market conditions.</p>",
+        thumbnail:
+          "https://images.unsplash.com/photo-1612550761236-e813928f7271?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        category: "Revenue Strategy",
+        createAt: formatDate(
+          new Date(currentDate.getTime() - 28 * 24 * 60 * 60 * 1000)
+        ),
+        readTime: getRandomReadingTime(),
+        author: authors[1],
+      },
+    ];
+
+    return mockBlogPosts;
+  },
+
+  // Get a single blog post by ID
+  getBlogPostById: async (id) => {
+    const allPosts = await API.getAllBlogPosts();
+    return allPosts.find((post) => post.id === Number.parseInt(id)) || null;
+  },
+
+  // Search blog posts
+  searchBlogPosts: async (query) => {
+    const allPosts = await API.getAllBlogPosts();
+    query = query.toLowerCase();
+
+    return allPosts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(query) ||
+        post.description.toLowerCase().includes(query) ||
+        post.category.toLowerCase().includes(query)
+    );
+  },
+
+  // Get posts by category
+  getBlogPostsByCategory: async (category) => {
+    const allPosts = await API.getAllBlogPosts();
+    return allPosts.filter((post) => post.category === category);
+  },
+};
+
 const Blogs = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Define allowed HTML tags for sanitization
-  const allowedTags = [
-    "p",
-    "br",
-    "strong",
-    "em",
-    "u",
-    "ul",
-    "ol",
-    "li",
-    "a",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-  ];
 
   // Add custom CSS for premium design
   useEffect(() => {
@@ -269,641 +456,650 @@ const Blogs = () => {
 
     // Add premium CSS
     styleElement.innerHTML = `
-      /* Premium Blog Styles */
-      :root {
-        --primary: #ff5e14;
-        --primary-light: #ff7a3d;
-        --primary-dark: #e04d00;
-        --secondary: #1e1e1e;
-        --light: #ffffff;
-        --gray-100: #f8f9fa;
-        --gray-200: #e9ecef;
-        --gray-300: #dee2e6;
-        --gray-400: #ced4da;
-        --gray-500: #adb5bd;
-        --gray-600: #6c757d;
-        --gray-700: #495057;
-        --gray-800: #343a40;
-        --gray-900: #212529;
-        --transition: all 0.3s ease;
-        --box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        --box-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.1);
+    /* Premium Blog Styles with Dark Theme */
+    :root {
+      --primary: #ff5e14;
+      --primary-light: #ff7a3d;
+      --primary-dark: #e04d00;
+      --dark-bg: #121212;
+      --dark-surface: #1e1e1e;
+      --dark-card: #252525;
+      --dark-border: #333333;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-tertiary: rgba(255, 255, 255, 0.5);
+      --box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      --box-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.4);
+      --transition: all 0.3s ease;
+    }
+    
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-primary);
+    }
+    
+    /* Premium Banner Styles */
+    .premium-blog-banner {
+      position: relative;
+      height: 400px;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .banner-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: scale(1.05);
+      filter: brightness(0.5);
+    }
+    
+    .banner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.8) 100%);
+      z-index: 1;
+    }
+    
+    .banner-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 20px;
+    }
+    
+    .banner-title-container {
+      margin-bottom: 20px;
+    }
+    
+    .banner-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      letter-spacing: -1px;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      text-transform: capitalize;
+    }
+    
+    .banner-accent {
+      height: 4px;
+      width: 80px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      margin: 20px auto 0;
+      border-radius: 2px;
+    }
+    
+    .banner-breadcrumb {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-size: 1rem;
+    }
+    
+    .banner-breadcrumb span {
+      margin: 0 5px;
+    }
+    
+    .breadcrumb-separator {
+      color: var(--primary);
+    }
+    
+    .banner-breadcrumb .active {
+      color: var(--primary-light);
+    }
+    
+    .banner-shape-divider {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+      z-index: 2;
+    }
+    
+    /* Blog Page Styles */
+    #blogs-page {
+      background-color: var(--dark-bg);
+      padding: 80px 0;
+      position: relative;
+    }
+    
+    .section-title {
+      position: relative;
+      margin-bottom: 50px;
+    }
+    
+    .section-title h3 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      position: relative;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+    
+    .section-title h3::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 3px;
+    }
+    
+    .section-title p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+    }
+    
+    /* Blog Cards */
+    .blog-card {
+      background: var(--dark-surface);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+      height: 100%;
+      border: 1px solid var(--dark-border);
+    }
+    
+    .blog-card:hover {
+      box-shadow: var(--box-shadow-hover);
+      transform: translateY(-5px);
+    }
+    
+    .blog-image {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .blog-image img {
+      transition: var(--transition);
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+    }
+    
+    .blog-card:hover .blog-image img {
+      transform: scale(1.05);
+    }
+    
+    .blog-category {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--primary);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      z-index: 2;
+    }
+    
+    .blog-content {
+      padding: 25px;
+    }
+    
+    .blog-meta {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .blog-meta-item {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    
+    .blog-meta-item svg {
+      margin-right: 5px;
+      color: var(--primary);
+    }
+    
+    .blog-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 15px;
+    }
+    
+    .blog-title a {
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    .blog-title a:hover {
+      color: var(--primary);
+    }
+    
+    .blog-excerpt {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .blog-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      border-top: 1px solid var(--dark-border);
+    }
+    
+    .blog-author {
+      display: flex;
+      align-items: center;
+    }
+    
+    .blog-author img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+    
+    .blog-author-info {
+      margin-left: 10px;
+    }
+    
+    .blog-author-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    .read-more svg {
+      margin-left: 5px;
+      transition: var(--transition);
+    }
+    
+    .read-more:hover {
+      color: var(--primary-light);
+    }
+    
+    .read-more:hover svg {
+      transform: translateX(3px);
+    }
+    
+    /* Sidebar Styles */
+    .blog-sidebar {
+      position: sticky;
+      top: 100px;
+    }
+    
+    .sidebar-widget {
+      background: var(--dark-surface);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--box-shadow);
+      border: 1px solid var(--dark-border);
+    }
+    
+    .widget-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 25px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    
+    .widget-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 3px;
+    }
+    
+    .search-form {
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 20px;
+      padding-right: 50px;
+      border: 1px solid var(--dark-border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: var(--transition);
+      background-color: var(--dark-card);
+      color: var(--text-primary);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 94, 20, 0.1);
+    }
+    
+    .search-button {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .search-button:hover {
+      color: var(--primary);
+    }
+    
+    .recent-post {
+      display: flex;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--dark-border);
+    }
+    
+    .recent-post:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .recent-post-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .recent-post-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .recent-post:hover .recent-post-image img {
+      transform: scale(1.05);
+    }
+    
+    .recent-post-content {
+      padding-left: 15px;
+    }
+    
+    .recent-post-date {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .recent-post-date svg {
+      margin-right: 5px;
+      color: var(--primary);
+    }
+    
+    .recent-post-title {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 0;
+    }
+    
+    .recent-post-title a {
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    .recent-post-title a:hover {
+      color: var(--primary);
+    }
+    
+    .category-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .category-item {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--dark-border);
+    }
+    
+    .category-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .category-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    
+    .category-link:hover {
+      color: var(--primary);
+    }
+    
+    .category-count {
+      background: var(--dark-card);
+      color: var(--text-tertiary);
+      padding: 2px 10px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      transition: var(--transition);
+    }
+    
+    .category-link:hover .category-count {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .tag {
+      padding: 5px 15px;
+      background: var(--dark-card);
+      color: var(--text-secondary);
+      border-radius: 30px;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    .tag:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Loading State */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 0;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--dark-border);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      margin-bottom: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    /* Error State */
+    .error-container {
+      background: rgba(220, 38, 38, 0.1);
+      border-left: 4px solid #dc2626;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    
+    .error-message {
+      color: #ef4444;
+      font-weight: 500;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 1199px) {
+      .banner-title {
+        font-size: 3rem;
       }
-      
-      /* Premium Banner Styles */
+    }
+    
+    @media (max-width: 991px) {
       .premium-blog-banner {
-        position: relative;
-        height: 400px;
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      .banner-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        transform: scale(1.05);
-        filter: brightness(0.8);
-      }
-      
-      .banner-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.7) 100%);
-        z-index: 1;
-      }
-      
-      .banner-content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        padding: 0 20px;
-      }
-      
-      .banner-title-container {
-        margin-bottom: 20px;
+        height: 350px;
       }
       
       .banner-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        color: #ffffff;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        letter-spacing: -1px;
-        margin: 0;
-        padding: 0;
-        position: relative;
-        text-transform: capitalize;
-      }
-      
-      .banner-accent {
-        height: 4px;
-        width: 80px;
-        background: linear-gradient(90deg, var(--primary), var(--primary-light));
-        margin: 20px auto 0;
-        border-radius: 2px;
-      }
-      
-      .banner-breadcrumb {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #fff;
-        font-size: 1rem;
-      }
-      
-      .banner-breadcrumb span {
-        margin: 0 5px;
-      }
-      
-      .breadcrumb-separator {
-        color: var(--primary);
-      }
-      
-      .banner-breadcrumb .active {
-        color: var(--primary-light);
-      }
-      
-      .banner-shape-divider {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        overflow: hidden;
-        line-height: 0;
-        z-index: 2;
-      }
-      
-      /* Blog Page Styles */
-      #blogs-page {
-        background-color: #fff;
-        padding: 80px 0;
-        position: relative;
-      }
-      
-      .section-title {
-        position: relative;
-        margin-bottom: 50px;
+        font-size: 2.5rem;
       }
       
       .section-title h3 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--gray-800);
-        position: relative;
-        display: inline-block;
-        margin-bottom: 15px;
+        font-size: 2.2rem;
       }
       
-      .section-title h3::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--primary-light));
-        border-radius: 3px;
+      .blog-sidebar {
+        margin-top: 50px;
+        position: static;
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .premium-blog-banner {
+        height: 300px;
       }
       
-      .section-title p {
-        font-size: 1.1rem;
-        color: var(--gray-600);
-        max-width: 600px;
+      .banner-title {
+        font-size: 2rem;
       }
       
-      /* Blog Cards */
-      .blog-card {
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: var(--box-shadow);
-        transition: var(--transition);
-        height: 100%;
-        border: 1px solid var(--gray-200);
+      #blogs-page {
+        padding: 60px 0;
       }
       
-      .blog-card:hover {
-        box-shadow: var(--box-shadow-hover);
-        transform: translateY(-5px);
+      .section-title {
+        margin-bottom: 30px;
       }
       
-      .blog-image {
-        position: relative;
-        overflow: hidden;
-      }
-      
-      .blog-image img {
-        transition: var(--transition);
-        width: 100%;
-        height: 240px;
-        object-fit: cover;
-      }
-      
-      .blog-card:hover .blog-image img {
-        transform: scale(1.05);
-      }
-      
-      .blog-category {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: var(--primary);
-        color: white;
-        padding: 5px 15px;
-        border-radius: 30px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        z-index: 2;
-      }
-      
-      .blog-content {
-        padding: 25px;
-      }
-      
-      .blog-meta {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        flex-wrap: wrap;
-      }
-      
-      .blog-meta-item {
-        display: flex;
-        align-items: center;
-        margin-right: 20px;
-        color: var(--gray-600);
-        font-size: 0.85rem;
-      }
-      
-      .blog-meta-item svg {
-        margin-right: 5px;
-        color: var(--primary);
+      .section-title h3 {
+        font-size: 1.8rem;
       }
       
       .blog-title {
-        font-size: 1.4rem;
-        font-weight: 700;
-        line-height: 1.4;
-        margin-bottom: 15px;
+        font-size: 1.2rem;
       }
       
-      .blog-title a {
-        color: var(--gray-800);
-        text-decoration: none;
-        transition: var(--transition);
-      }
-      
-      .blog-title a:hover {
-        color: var(--primary);
-      }
-      
-      .blog-excerpt {
-        color: var(--gray-600);
-        margin-bottom: 20px;
-        line-height: 1.6;
-      }
-      
-      .blog-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 20px;
-        border-top: 1px solid var(--gray-200);
-      }
-      
-      .blog-author {
-        display: flex;
-        align-items: center;
-      }
-      
-      .blog-author img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid var(--primary);
-      }
-      
-      .blog-author-info {
-        margin-left: 10px;
-      }
-      
-      .blog-author-name {
-        font-weight: 600;
-        color: var(--gray-800);
-        font-size: 0.9rem;
-        margin: 0;
-      }
-      
-      .read-more {
-        display: inline-flex;
-        align-items: center;
-        color: var(--primary);
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-decoration: none;
-        transition: var(--transition);
-      }
-      
-      .read-more svg {
-        margin-left: 5px;
-        transition: var(--transition);
-      }
-      
-      .read-more:hover {
-        color: var(--primary-dark);
-      }
-      
-      .read-more:hover svg {
-        transform: translateX(3px);
-      }
-      
-      /* Sidebar Styles */
-      .blog-sidebar {
-        position: sticky;
-        top: 100px;
+      .blog-content {
+        padding: 20px;
       }
       
       .sidebar-widget {
-        background: #fff;
-        border-radius: 12px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: var(--box-shadow);
-        border: 1px solid var(--gray-200);
-      }
-      
-      .widget-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--gray-800);
-        margin-bottom: 25px;
-        position: relative;
-        padding-bottom: 15px;
-      }
-      
-      .widget-title::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 40px;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--primary-light));
-        border-radius: 3px;
-      }
-      
-      .search-form {
-        position: relative;
-      }
-      
-      .search-input {
-        width: 100%;
-        padding: 12px 20px;
-        padding-right: 50px;
-        border: 1px solid var(--gray-300);
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: var(--transition);
-      }
-      
-      .search-input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(255, 94, 20, 0.1);
-      }
-      
-      .search-button {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: var(--gray-600);
-        cursor: pointer;
-        transition: var(--transition);
-      }
-      
-      .search-button:hover {
-        color: var(--primary);
-      }
-      
-      .recent-post {
-        display: flex;
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid var(--gray-200);
-      }
-      
-      .recent-post:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-      }
-      
-      .recent-post-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 8px;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
-      
-      .recent-post-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: var(--transition);
-      }
-      
-      .recent-post:hover .recent-post-image img {
-        transform: scale(1.05);
-      }
-      
-      .recent-post-content {
-        padding-left: 15px;
-      }
-      
-      .recent-post-date {
-        font-size: 0.8rem;
-        color: var(--gray-600);
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-      }
-      
-      .recent-post-date svg {
-        margin-right: 5px;
-        color: var(--primary);
-      }
-      
-      .recent-post-title {
-        font-size: 1rem;
-        font-weight: 600;
-        line-height: 1.4;
-        margin: 0;
-      }
-      
-      .recent-post-title a {
-        color: var(--gray-800);
-        text-decoration: none;
-        transition: var(--transition);
-      }
-      
-      .recent-post-title a:hover {
-        color: var(--primary);
-      }
-      
-      .category-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-      
-      .category-item {
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--gray-200);
-      }
-      
-      .category-item:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-      }
-      
-      .category-link {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: var(--gray-700);
-        text-decoration: none;
-        transition: var(--transition);
-        font-weight: 500;
-      }
-      
-      .category-link:hover {
-        color: var(--primary);
-      }
-      
-      .category-count {
-        background: var(--gray-200);
-        color: var(--gray-700);
-        padding: 2px 10px;
-        border-radius: 30px;
-        font-size: 0.8rem;
-        transition: var(--transition);
-      }
-      
-      .category-link:hover .category-count {
-        background: var(--primary);
-        color: white;
-      }
-      
-      .tag-cloud {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      
-      .tag {
-        padding: 5px 15px;
-        background: var(--gray-200);
-        color: var(--gray-700);
-        border-radius: 30px;
-        font-size: 0.85rem;
-        text-decoration: none;
-        transition: var(--transition);
-      }
-      
-      .tag:hover {
-        background: var(--primary);
-        color: white;
-      }
-      
-      /* Loading State */
-      .loading-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 50px 0;
-      }
-      
-      .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid var(--gray-200);
-        border-top: 3px solid var(--primary);
-        border-radius: 50%;
-        margin-bottom: 20px;
-      }
-      
-      .loading-text {
-        color: var(--gray-600);
-        font-size: 1.1rem;
-      }
-      
-      /* Error State */
-      .error-container {
-        background: #fff5f5;
-        border-left: 4px solid #f56565;
         padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 30px;
+      }
+    }
+    
+    @media (max-width: 575px) {
+      .premium-blog-banner {
+        height: 250px;
       }
       
-      .error-message {
-        color: #c53030;
-        font-weight: 500;
+      .banner-title {
+        font-size: 1.8rem;
       }
       
-      /* Responsive Styles */
-      @media (max-width: 1199px) {
-        .banner-title {
-          font-size: 3rem;
-        }
+      .banner-accent {
+        width: 60px;
+        margin-top: 15px;
       }
       
-      @media (max-width: 991px) {
-        .premium-blog-banner {
-          height: 350px;
-        }
-        
-        .banner-title {
-          font-size: 2.5rem;
-        }
-        
-        .section-title h3 {
-          font-size: 2.2rem;
-        }
-        
-        .blog-sidebar {
-          margin-top: 50px;
-          position: static;
-        }
+      .blog-meta {
+        flex-direction: column;
+        align-items: flex-start;
       }
       
-      @media (max-width: 767px) {
-        .premium-blog-banner {
-          height: 300px;
-        }
-        
-        .banner-title {
-          font-size: 2rem;
-        }
-        
-        #blogs-page {
-          padding: 60px 0;
-        }
-        
-        .section-title {
-          margin-bottom: 30px;
-        }
-        
-        .section-title h3 {
-          font-size: 1.8rem;
-        }
-        
-        .blog-title {
-          font-size: 1.2rem;
-        }
-        
-        .blog-content {
-          padding: 20px;
-        }
-        
-        .sidebar-widget {
-          padding: 20px;
-        }
+      .blog-meta-item {
+        margin-bottom: 5px;
       }
       
-      @media (max-width: 575px) {
-        .premium-blog-banner {
-          height: 250px;
-        }
-        
-        .banner-title {
-          font-size: 1.8rem;
-        }
-        
-        .banner-accent {
-          width: 60px;
-          margin-top: 15px;
-        }
-        
-        .blog-meta {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        
-        .blog-meta-item {
-          margin-bottom: 5px;
-        }
-        
-        .blog-footer {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        
-        .read-more {
-          margin-top: 15px;
-        }
+      .blog-footer {
+        flex-direction: column;
+        align-items: flex-start;
       }
-    `;
+      
+      .read-more {
+        margin-top: 15px;
+      }
+    }
+  `;
 
     // Append style to head
     document.head.appendChild(styleElement);
@@ -915,17 +1111,12 @@ const Blogs = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch blog posts when component mounts
+    // Fetch blog posts from our internal API
     const fetchBlogPosts = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(
-          "https://www.revenuerocket.site/api/post/"
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
+        // Use our internal API instead of external fetch
+        const data = await API.getAllBlogPosts();
         setBlogPosts(data);
         setError(null);
       } catch (err) {
@@ -953,21 +1144,40 @@ const Blogs = () => {
   // Function to extract first few words from title for main listing
   const extractMainTitle = (title) => {
     const words = title.split(" ");
-    const firstWords = words.slice(0, Math.min(words.length - 1, 7)).join(" ");
-    const lastWord = words[words.length - 1];
-    return `${firstWords} ${lastWord}`;
+    if (words.length <= 8) return title;
+    const firstWords = words.slice(0, 7).join(" ");
+    return `${firstWords}...`;
   };
 
   // Function to extract fewer words for sidebar listing
   const extractSidebarTitle = (title) => {
     const words = title.split(" ");
-    const firstWords = words.slice(0, Math.min(words.length - 1, 2)).join(" ");
-    const lastWord = words[words.length - 1];
-    return `${firstWords} ${lastWord}`;
+    if (words.length <= 4) return title;
+    const firstWords = words.slice(0, 3).join(" ");
+    return `${firstWords}...`;
   };
 
   // Function to sanitize HTML content
   const sanitizeHtml = (html) => {
+    // Define allowed HTML tags
+    const allowedTags = [
+      "p",
+      "br",
+      "strong",
+      "em",
+      "u",
+      "ul",
+      "ol",
+      "li",
+      "a",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+    ];
+
     // Create a regex pattern to match all tags except allowed ones
     const pattern = new RegExp(
       `<(?!\/?(?:${allowedTags.join("|")})\\b)[^>]*\/?>`,
@@ -987,7 +1197,7 @@ const Blogs = () => {
   const filteredPosts = blogPosts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.descrioption.toLowerCase().includes(searchTerm.toLowerCase());
+      post.description.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesCategory =
       activeCategory === "All" ||
@@ -999,17 +1209,14 @@ const Blogs = () => {
   // Get categories from posts
   const categories = [
     "All",
-    ...new Set(blogPosts.map((post) => post.category).filter(Boolean)),
+    ...new Set(
+      blogPosts.map((post) => post.category || "Technology").filter(Boolean)
+    ),
   ];
-
-  // Get random reading time for demo
-  const getReadingTime = () => {
-    return Math.floor(Math.random() * 10) + 3; // 3-12 minutes
-  };
 
   return (
     <>
-      <Header tags={location.href} />
+      <Header tags={window.location.href} />
 
       {/* Using our custom PremiumBanner component */}
       <PremiumBanner Img={blog_banner} title="Explore Our Blog" color="#fff" />
@@ -1020,7 +1227,8 @@ const Blogs = () => {
             <h3>Latest Articles</h3>
             <p>
               Discover insights, tips, and the latest trends in our collection
-              of thought-provoking articles.
+              of thought-provoking articles about revenue strategies and
+              business growth.
             </p>
           </div>
 
@@ -1052,18 +1260,18 @@ const Blogs = () => {
                               alt={post.title}
                               title={post.title}
                             />
-                            <div className="blog-category">Technology</div>
+                            <div className="blog-category">{post.category}</div>
                           </div>
 
                           <div className="blog-content">
                             <div className="blog-meta">
                               <div className="blog-meta-item">
                                 <FontAwesomeIcon icon={faCalendarAlt} />
-                                <span>{post.createAt || "June 12, 2023"}</span>
+                                <span>{post.createAt}</span>
                               </div>
                               <div className="blog-meta-item">
                                 <FontAwesomeIcon icon={faClock} />
-                                <span>{getReadingTime()} min read</span>
+                                <span>{post.readTime} min read</span>
                               </div>
                             </div>
 
@@ -1077,20 +1285,23 @@ const Blogs = () => {
                               </NavLink>
                             </h3>
 
-                            <p className="blog-excerpt">
-                              {truncateText(post.descrioption, 120)}
-                            </p>
+                            <p
+                              className="blog-excerpt"
+                              dangerouslySetInnerHTML={{
+                                __html: truncateText(post.description, 120),
+                              }}
+                            ></p>
 
                             <div className="blog-footer">
                               <div className="blog-author">
                                 <img
-                                  src={img || "/placeholder.svg"}
+                                  src={post.author?.image || img}
                                   alt="Author"
-                                  title="Mustafa Khan"
+                                  title={post.author?.name}
                                 />
                                 <div className="blog-author-info">
                                   <p className="blog-author-name">
-                                    Mustafa Khan
+                                    {post.author?.name}
                                   </p>
                                 </div>
                               </div>
@@ -1165,7 +1376,7 @@ const Blogs = () => {
                         <div className="recent-post-content">
                           <div className="recent-post-date">
                             <FontAwesomeIcon icon={faCalendarAlt} />
-                            <span>{post.createAt || "June 12, 2023"}</span>
+                            <span>{post.createAt}</span>
                           </div>
                           <h5 className="recent-post-title">
                             <NavLink
@@ -1214,29 +1425,75 @@ const Blogs = () => {
                   <div className="sidebar-widget">
                     <h4 className="widget-title">Popular Tags</h4>
                     <div className="tag-cloud">
-                      <a href="#" className="tag">
-                        Technology
+                      <a
+                        href="#"
+                        className="tag"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchTerm("revenue");
+                        }}
+                      >
+                        Revenue
                       </a>
-                      <a href="#" className="tag">
+                      <a
+                        href="#"
+                        className="tag"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchTerm("business");
+                        }}
+                      >
                         Business
                       </a>
-                      <a href="#" className="tag">
+                      <a
+                        href="#"
+                        className="tag"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchTerm("marketing");
+                        }}
+                      >
                         Marketing
                       </a>
-                      <a href="#" className="tag">
-                        Design
+                      <a
+                        href="#"
+                        className="tag"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchTerm("finance");
+                        }}
+                      >
+                        Finance
                       </a>
-                      <a href="#" className="tag">
-                        Development
+                      <a
+                        href="#"
+                        className="tag"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchTerm("growth");
+                        }}
+                      >
+                        Growth
                       </a>
-                      <a href="#" className="tag">
+                      <a
+                        href="#"
+                        className="tag"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchTerm("strategy");
+                        }}
+                      >
                         Strategy
                       </a>
-                      <a href="#" className="tag">
-                        Innovation
-                      </a>
-                      <a href="#" className="tag">
-                        Software
+                      <a
+                        href="#"
+                        className="tag"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchTerm("technology");
+                        }}
+                      >
+                        Technology
                       </a>
                     </div>
                   </div>
